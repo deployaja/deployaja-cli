@@ -331,15 +331,43 @@ func (c *APIClient) Rollback(name, version string) error {
 }
 
 func (c *APIClient) Drop(name string) error {
-	body := map[string]string{
-		"name": name,
-	}
+	url := fmt.Sprintf("%s/drop/%s", c.BaseURL, name)
 
-	resp, err := c.makeRequest("POST", c.BaseURL+"/drop", body)
+	resp, err := c.makeRequest("DELETE", url, nil)
 	if err != nil {
 		return err
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
 
 	return nil
+}
+
+// InstallApp retrieves the configuration for a marketplace app
+func (c *APIClient) InstallApp(appName string) (*InstallResponse, error) {
+	url := fmt.Sprintf("%s/install?app=%s", c.BaseURL, appName)
+
+	resp, err := c.makeRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var installResp InstallResponse
+	err = json.NewDecoder(resp.Body).Decode(&installResp)
+	return &installResp, err
+}
+
+// SearchApps searches for apps in the marketplace
+func (c *APIClient) SearchApps(query string) (*SearchResponse, error) {
+	url := fmt.Sprintf("%s/search?q=%s", c.BaseURL, query)
+
+	resp, err := c.makeRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var searchResp SearchResponse
+	err = json.NewDecoder(resp.Body).Decode(&searchResp)
+	return &searchResp, err
 }

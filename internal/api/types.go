@@ -77,3 +77,30 @@ type LogEntry struct {
 	Message   string `json:"message"`
 	Source    string `json:"source"`
 }
+
+// Marketplace types
+type InstallResponse struct {
+	AppName    string `json:"appName"`
+	Config     string `json:"config"` // Base64 encoded YAML config
+	Message    string `json:"message"`
+	Status     string `json:"status"`
+	InstallURL string `json:"installUrl,omitempty"`
+}
+
+type SearchResponse struct {
+	Apps  []MarketplaceApp `json:"apps"`
+	Total int              `json:"total"`
+}
+
+type MarketplaceApp struct {
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Category    string   `json:"category"`
+	Tags        []string `json:"tags"`
+	Author      string   `json:"author"`
+	Version     string   `json:"version"`
+	Downloads   int      `json:"downloads"`
+	Rating      float64  `json:"rating"`
+	Image       string   `json:"image,omitempty"`
+	Repository  string   `json:"repository,omitempty"`
+}

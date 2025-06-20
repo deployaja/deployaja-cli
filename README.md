@@ -61,6 +61,12 @@ aja deploy
 aja deploy --build
 ```
 
+## Deploy APP from marketplace
+
+```
+aja install n8n
+```
+
 ## 📖 Usage Examples
 
 ### Basic Web Application
@@ -180,6 +186,8 @@ Daily: IDR 1.500
 | `aja deps` | List available dependencies |
 | `aja login` | Authenticate with platform |
 | `aja config` | Show configuration |
+| `aja search QUERY` | Search for apps in the marketplace |
+| `aja install APPNAME` | Install an app from the marketplace |
 
 ### Command Examples
 
@@ -204,6 +212,14 @@ aja env set DEBUG=true
 
 # Force delete without confirmation
 aja drop my-app --force
+
+# Search for apps in marketplace
+aja search wordpress
+aja search "node.js api"
+
+# Install app from marketplace
+aja install wordpress
+aja install react-app
 ```
 
 ### Logs Command Options
@@ -230,6 +246,86 @@ aja logs my-app --tail 20 -f
 **Available Flags:**
 - `--tail <number>`: Number of lines to show (default: 100)
 - `-f, --follow`: Follow log output in real-time
+
+## 🏪 Marketplace
+
+The Aja marketplace provides pre-configured applications that you can deploy with a single command. Browse, search, and install applications from the community.
+
+### Searching Apps
+
+```bash
+# Search by name
+aja search wordpress
+
+# Search by description
+aja search "node.js api"
+
+# Search by category
+aja search "blog"
+```
+
+Example output:
+```
+🔍 Searching for: wordpress
+
+✅ Found 3 apps
+
+1 WordPress
+   A popular content management system
+   Category: CMS
+   Author: WordPress.org
+   Version: 6.4
+   Downloads: 15420
+   Rating: 4.8/5.0
+   Tags: cms, blog, php, mysql
+
+2 WordPress with WooCommerce
+   WordPress with e-commerce capabilities
+   Category: E-commerce
+   Author: Automattic
+   Version: 8.5
+   Downloads: 8920
+   Rating: 4.6/5.0
+   Tags: cms, ecommerce, woocommerce, php
+
+💡 Use 'aja install <app-name>' to install an app
+```
+
+### Installing Apps
+
+```bash
+# Install an app from marketplace
+aja install wordpress
+```
+
+This will:
+1. Download the app configuration from the marketplace
+2. Save it as `wordpress-install.json` in your current directory
+3. Display installation instructions
+
+Example output:
+```
+📦 Installing wordpress from marketplace...
+✅ Configuration saved to: /path/to/wordpress-install.json
+💡 Review the configuration and run 'aja deploy' to deploy
+🔗 Install URL: https://marketplace.aja.id/apps/wordpress
+```
+
+The generated JSON file contains:
+- App configuration in YAML format
+- Installation instructions
+- Metadata about the app
+
+### Available App Categories
+
+- **CMS**: Content Management Systems (WordPress, Drupal, etc.)
+- **E-commerce**: Online stores (WooCommerce, Shopify, etc.)
+- **Blog**: Blogging platforms (Ghost, Jekyll, etc.)
+- **API**: Backend APIs (Node.js, Python, Go, etc.)
+- **Frontend**: Single Page Applications (React, Vue, Angular, etc.)
+- **Database**: Database applications (phpMyAdmin, pgAdmin, etc.)
+- **Monitoring**: Monitoring tools (Grafana, Prometheus, etc.)
+- **Development**: Development tools (GitLab, Jenkins, etc.)
 
 ## 🗃️ Supported Dependencies
 
