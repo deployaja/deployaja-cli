@@ -145,15 +145,8 @@ Dependencies:
   - redis (redis 7)
 
 💰 Cost Estimate
-Monthly: $45.50 USD
-Daily: $1.52 USD
-
-Breakdown:
-  Compute: $12.00
-  Storage: $2.50
-  Network: $1.00
-  postgresql: $15.00
-  redis: $8.00
+Monthly: IDR 45.500
+Daily: IDR 1.500
 ```
 
 ## 🔧 Commands
@@ -442,8 +435,7 @@ aja env --help
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `AJA_API_URL` | Override API base URL | `https://aja.id/api/v1` |
-| `AJA_CONFIG_DIR` | Override config directory | `~/.aja` |
+| `AJA_CONFIG_DIR` | Override config directory | `~/.deployaja` |
 | `AJA_DEBUG` | Enable debug logging | `false` |
 | `NO_COLOR` | Disable colored output | `false` |
 
