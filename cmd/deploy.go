@@ -26,20 +26,20 @@ func deployCmd() *cobra.Command {
 				return err
 			}
 
-			// Validate Dockerfile exists (required for deployment)
-			if err := validateDockerfileExists(); err != nil {
-				return err
-			}
 
 			// Load config from specified file or default
 			var cfg *config.DeploymentConfig
 			var err error
 			if fileFlag != "" {
 				cfg, err = config.LoadDeploymentConfigFromFile(fileFlag)
-			} else {
+			} else {								
+				if err := validateDefaultConfigExists(); err != nil {
+					return err
+				}	
 				cfg, err = config.LoadDeploymentConfig()
 			}
-			if err != nil {
+
+			if err := validateDockerfileExists(); err != nil {
 				return err
 			}
 
@@ -65,7 +65,7 @@ func deployCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&fileFlag, "file", "f", "", "Path to deployment configuration file (default: deployaja.yaml)")
+	cmd.Flags().StringVarP(&fileFlag, "file", "f", "", "Path to deployment configuration file (required if deployaja.yaml doesn't exist)")
 
 	return cmd
 }
@@ -76,6 +76,17 @@ func validateDockerfileExists() error {
 
 	if _, err := os.Stat(dockerfilePath); os.IsNotExist(err) {
 		return fmt.Errorf("%s Dockerfile not found in current directory. Dockerfile is required for deployment", ui.ErrorPrint("✗"))
+	}
+
+	return nil
+}
+
+// validateDefaultConfigExists checks if the default config file exists
+func validateDefaultConfigExists() error {
+	defaultConfigPath := filepath.Join(".", "deployaja.yaml")
+
+	if _, err := os.Stat(defaultConfigPath); os.IsNotExist(err) {
+		return fmt.Errorf("%s Default deployment configuration file not found in current directory. Use 'deployaja init' to create one or specify a config file with -f flag", ui.ErrorPrint("✗"))
 	}
 
 	return nil
