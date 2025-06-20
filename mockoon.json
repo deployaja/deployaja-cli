@@ -1,0 +1,1072 @@
+{
+  "name": "DeployAja API Mock",
+  "port": 3001,
+  "routes": [
+    {
+      "method": "get",
+      "endpoint": "/check",
+      "documentation": "Check authentication status during login flow",
+      "responses": [
+        {
+          "label": "Authentication successful",
+          "body": "{\n  \"status\": \"authenticated\",\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEyMyIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsImlhdCI6MTczMjAwMDAwMCwiZXhwIjoxNzMyMDg2NDAwfQ.example\"\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "acad3f50-a493-4170-ac04-434bc1f1dc1b",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Authentication pending",
+          "body": "{\n  \"status\": \"pending\"\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "1b37b55e-cefb-4023-a841-fbc215795015",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Invalid session code",
+          "body": "{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"Invalid session code format\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "b6fc4f16-85d2-4191-ba88-7eb0ce3ee561",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Session not found",
+          "body": "{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"Session not found or expired\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "ba0191f4-1fb0-4835-bd7e-6084de83e6e2",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "2d9fdcfb-7540-46f0-b202-a3f98317ee3e",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "post",
+      "endpoint": "/cost",
+      "documentation": "Get deployment cost forecast",
+      "responses": [
+        {
+          "label": "Cost estimation successful",
+          "body": "{\n  \"estimatedCost\": {\n    \"monthly\": 45.50,\n    \"daily\": 1.52,\n    \"currency\": \"USD\"\n  },\n  \"breakdown\": {\n    \"compute\": 12.00,\n    \"storage\": 2.50,\n    \"network\": 1.00,\n    \"dependencies\": {\n      \"postgresql\": 15.00,\n      \"redis\": 8.00,\n      \"rabbitmq\": 7.00\n    }\n  },\n  \"dependencyDetails\": [\n    {\n      \"name\": \"postgres\",\n      \"type\": \"postgresql\",\n      \"version\": \"15\",\n      \"monthlyCost\": 15.00,\n      \"specs\": {\n        \"cpu\": \"0.5 vCPU\",\n        \"memory\": \"1GB\",\n        \"storage\": \"1GB\"\n      }\n    },\n    {\n      \"name\": \"redis-cache\",\n      \"type\": \"redis\",\n      \"version\": \"7\",\n      \"monthlyCost\": 8.00,\n      \"specs\": {\n        \"cpu\": \"0.25 vCPU\",\n        \"memory\": \"512MB\",\n        \"storage\": \"512MB\"\n      }\n    },\n    {\n      \"name\": \"message-queue\",\n      \"type\": \"rabbitmq\",\n      \"version\": \"3.12\",\n      \"monthlyCost\": 7.00,\n      \"specs\": {\n        \"cpu\": \"0.25 vCPU\",\n        \"memory\": \"512MB\",\n        \"storage\": \"512MB\"\n      }\n    }\n  ]\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "777493cf-c726-4c37-8968-f178e520f94a",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Invalid deployment configuration",
+          "body": "{\n  \"error\": {\n    \"code\": \"INVALID_CONFIG\",\n    \"message\": \"Invalid configuration: missing required field 'name'\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "93cab757-0642-46c9-9c2f-d793dbb1e09f",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "e103b2bb-3dbb-4931-b81d-c54aafcab69a",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "get",
+      "endpoint": "/dependencies",
+      "documentation": "Get available dependencies and specifications",
+      "responses": [
+        {
+          "label": "Dependencies list retrieved successfully",
+          "body": "{\n  \"dependencies\": [\n    {\n      \"type\": \"postgresql\",\n      \"name\": \"PostgreSQL\",\n      \"versions\": [\"13\", \"14\", \"15\", \"16\"],\n      \"defaultVersion\": \"15\",\n      \"pricing\": {\n        \"base\": 15.00,\n        \"storage\": 0.10\n      },\n      \"specs\": {\n        \"cpu\": \"0.5 vCPU\",\n        \"memory\": \"1GB\",\n        \"storage\": \"1GB\"\n      }\n    },\n    {\n      \"type\": \"mysql\",\n      \"name\": \"MySQL\",\n      \"versions\": [\"8.0\", \"8.1\"],\n      \"defaultVersion\": \"8.0\",\n      \"pricing\": {\n        \"base\": 12.00,\n        \"storage\": 0.08\n      },\n      \"specs\": {\n        \"cpu\": \"0.5 vCPU\",\n        \"memory\": \"1GB\",\n        \"storage\": \"1GB\"\n      }\n    },\n    {\n      \"type\": \"redis\",\n      \"name\": \"Redis\",\n      \"versions\": [\"6\", \"7\"],\n      \"defaultVersion\": \"7\",\n      \"pricing\": {\n        \"base\": 8.00,\n        \"storage\": 0.05\n      },\n      \"specs\": {\n        \"cpu\": \"0.25 vCPU\",\n        \"memory\": \"512MB\",\n        \"storage\": \"512MB\"\n      }\n    },\n    {\n      \"type\": \"rabbitmq\",\n      \"name\": \"RabbitMQ\",\n      \"versions\": [\"3.11\", \"3.12\"],\n      \"defaultVersion\": \"3.12\",\n      \"pricing\": {\n        \"base\": 7.00,\n        \"storage\": 0.05\n      },\n      \"specs\": {\n        \"cpu\": \"0.25 vCPU\",\n        \"memory\": \"512MB\",\n        \"storage\": \"512MB\"\n      }\n    },\n    {\n      \"type\": \"mongodb\",\n      \"name\": \"MongoDB\",\n      \"versions\": [\"6.0\", \"7.0\"],\n      \"defaultVersion\": \"7.0\",\n      \"pricing\": {\n        \"base\": 18.00,\n        \"storage\": 0.12\n      },\n      \"specs\": {\n        \"cpu\": \"0.5 vCPU\",\n        \"memory\": \"1GB\",\n        \"storage\": \"1GB\"\n      }\n    },\n    {\n      \"type\": \"elasticsearch\",\n      \"name\": \"Elasticsearch\",\n      \"versions\": [\"8.8\", \"8.9\"],\n      \"defaultVersion\": \"8.9\",\n      \"pricing\": {\n        \"base\": 25.00,\n        \"storage\": 0.15\n      },\n      \"specs\": {\n        \"cpu\": \"1 vCPU\",\n        \"memory\": \"2GB\",\n        \"storage\": \"2GB\"\n      }\n    },\n    {\n      \"type\": \"memcached\",\n      \"name\": \"Memcached\",\n      \"versions\": [\"1.6\"],\n      \"defaultVersion\": \"1.6\",\n      \"pricing\": {\n        \"base\": 5.00,\n        \"storage\": 0.03\n      },\n      \"specs\": {\n        \"cpu\": \"0.25 vCPU\",\n        \"memory\": \"256MB\",\n        \"storage\": \"256MB\"\n      }\n    }\n  ]\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "ee35ad7e-ca15-460c-a13d-cf495c8b72c5",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "51ba5ac2-de23-4f5c-8800-9166c019b2da",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "post",
+      "endpoint": "/deploy",
+      "documentation": "Deploy application",
+      "responses": [
+        {
+          "label": "Deployment initiated successfully",
+          "body": "{\n  \"deploymentId\": \"dep_abc123def456\",\n  \"status\": \"deploying\",\n  \"message\": \"Deployment initiated successfully\",\n  \"estimatedTime\": \"2-3 minutes\",\n  \"url\": \"https://my-app.deployaja.id\"\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "259e9130-de15-4a91-87c8-94d14f2c990f",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Invalid deployment configuration",
+          "body": "{\n  \"error\": {\n    \"code\": \"INVALID_CONFIG\",\n    \"message\": \"Invalid configuration: missing required field 'name'\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "36d3b66b-dd62-485d-8d9f-1d5e11e1778b",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Unauthorized",
+          "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or expired token\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "d5943f1c-3d81-4849-95a3-81c900ab5a2c",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Insufficient permissions or quota",
+          "body": "{\n  \"error\": {\n    \"code\": \"INSUFFICIENT_QUOTA\",\n    \"message\": \"Monthly quota exceeded\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "5868b589-6fc0-4e7b-93cd-343c393d946c",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "7f542999-cdd9-4213-b0b8-416daa4a2cf0",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "get",
+      "endpoint": "/status",
+      "documentation": "Get deployment status",
+      "responses": [
+        {
+          "label": "Status retrieved successfully",
+          "body": "{\n  \"deployments\": [\n    {\n      \"name\": \"my-app\",\n      \"status\": \"running\",\n      \"replicas\": {\n        \"desired\": 1,\n        \"available\": 1,\n        \"ready\": 1\n      },\n      \"url\": \"https://my-app.deployaja.id\",\n      \"lastDeployed\": \"2025-06-20T10:30:00Z\",\n      \"dependencies\": [\n        {\n          \"name\": \"postgres\",\n          \"type\": \"postgresql\",\n          \"status\": \"running\",\n          \"version\": \"15\",\n          \"url\": \"postgres-myapp.deployaja.id:5432\"\n        },\n        {\n          \"name\": \"redis-cache\",\n          \"type\": \"redis\",\n          \"status\": \"running\",\n          \"version\": \"7\",\n          \"url\": \"redis-myapp.deployaja.id:6379\"\n        }\n      ]\n    },\n    {\n      \"name\": \"api-service\",\n      \"status\": \"deploying\",\n      \"replicas\": {\n        \"desired\": 2,\n        \"available\": 1,\n        \"ready\": 1\n      },\n      \"url\": \"https://api-service.deployaja.id\",\n      \"lastDeployed\": \"2025-06-20T11:00:00Z\",\n      \"dependencies\": [\n        {\n          \"name\": \"postgres-api\",\n          \"type\": \"postgresql\",\n          \"status\": \"starting\",\n          \"version\": \"15\",\n          \"url\": \"postgres-api.deployaja.id:5432\"\n        }\n      ]\n    }\n  ]\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "a3ff6ee1-13cf-4a5a-8b4d-377dc7c04303",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Unauthorized",
+          "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or expired token\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "c49ca7e9-a92a-4126-ae27-e13a1e2813bf",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Deployment not found",
+          "body": "{\n  \"error\": {\n    \"code\": \"DEPLOYMENT_NOT_FOUND\",\n    \"message\": \"Deployment 'nonexistent-app' not found\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "91295ed8-1887-4fc5-90dd-65246b7e2a6a",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "a84b5423-7c31-4b93-bbad-7e6ce753c0d5",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "get",
+      "endpoint": "/list",
+      "documentation": "List all active deployments",
+      "responses": [
+        {
+          "label": "Deployments list retrieved successfully",
+          "body": "{\n  \"deployments\": [\n    {\n      \"name\": \"my-app\",\n      \"status\": \"running\",\n      \"url\": \"https://my-app.deployaja.id\",\n      \"createdAt\": \"2025-06-20T10:00:00Z\",\n      \"lastDeployed\": \"2025-06-20T10:30:00Z\"\n    },\n    {\n      \"name\": \"api-service\",\n      \"status\": \"deploying\",\n      \"url\": \"https://api-service.deployaja.id\",\n      \"createdAt\": \"2025-06-20T11:00:00Z\",\n      \"lastDeployed\": \"2025-06-20T11:00:00Z\"\n    },\n    {\n      \"name\": \"web-frontend\",\n      \"status\": \"stopped\",\n      \"url\": \"https://web-frontend.deployaja.id\",\n      \"createdAt\": \"2025-06-19T15:00:00Z\",\n      \"lastDeployed\": \"2025-06-19T15:00:00Z\"\n    }\n  ]\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "4a49ef20-ffe3-4c7e-a181-35dc9e9a646d",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Unauthorized",
+          "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or expired token\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "75d6ea11-d711-4389-8f14-fecf45006e47",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "a7d22d10-60e1-40f2-b29e-644a357f20d1",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "get",
+      "endpoint": "logs/test",
+      "documentation": "Get deployment logs",
+      "responses": [
+        {
+          "label": "Logs retrieved successfully",
+          "body": "{\n  \"logs\": [\n    {\n      \"timestamp\": \"2025-06-20T10:30:00Z\",\n      \"level\": \"info\",\n      \"message\": \"Server started on port 3000\",\n      \"source\": \"app\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:55Z\",\n      \"level\": \"info\",\n      \"message\": \"Connected to PostgreSQL database\",\n      \"source\": \"app\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:50Z\",\n      \"level\": \"info\",\n      \"message\": \"Connected to Redis cache\",\n      \"source\": \"app\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:45Z\",\n      \"level\": \"info\",\n      \"message\": \"Application container started\",\n      \"source\": \"app\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:40Z\",\n      \"level\": \"info\",\n      \"message\": \"PostgreSQL dependency is ready\",\n      \"source\": \"postgres\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:35Z\",\n      \"level\": \"info\",\n      \"message\": \"Redis dependency is ready\",\n      \"source\": \"redis-cache\"\n    }\n  ]\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "d7bc14d5-3904-405c-815d-d24e2917e3f4",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Switching to WebSocket for log streaming",
+          "body": "WebSocket upgrade response",
+          "headers": [
+            {
+              "key": "Upgrade",
+              "value": "websocket"
+            },
+            {
+              "key": "Connection",
+              "value": "Upgrade"
+            }
+          ],
+          "uuid": "25509324-886f-4318-9dfd-b88530919493",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Unauthorized",
+          "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or expired token\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "3c0562b1-ee69-4551-bd91-348d72d8ad6f",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Deployment not found",
+          "body": "{\n  \"error\": {\n    \"code\": \"DEPLOYMENT_NOT_FOUND\",\n    \"message\": \"Deployment 'nonexistent-app' not found\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "a43ed6de-680e-4289-917a-34901586ed4f",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "a50d07fd-81a5-4d84-9ee9-e4a1d847d7ed",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "post",
+      "endpoint": "/rollback",
+      "documentation": "Rollback deployment",
+      "responses": [
+        {
+          "label": "Rollback initiated successfully",
+          "body": "{\n  \"status\": \"rolling_back\",\n  \"message\": \"Rollback initiated\",\n  \"targetVersion\": \"1.2.3\"\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "6dbdbe46-02b1-4361-bcff-7cededfa7aa1",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Invalid rollback request",
+          "body": "{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"No previous version available for rollback\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "dad62a2b-452a-4747-b8fc-810aceab7eb9",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Unauthorized",
+          "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or expired token\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "55be20eb-28fb-415d-a32e-1662bfd687d8",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Deployment not found",
+          "body": "{\n  \"error\": {\n    \"code\": \"DEPLOYMENT_NOT_FOUND\",\n    \"message\": \"Deployment 'nonexistent-app' not found\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "bae7cf5a-5282-4510-ab50-e8e38aa4d1d1",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "5ef5e166-cc05-4588-a130-3d1f52a5753f",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "post",
+      "endpoint": "/drop",
+      "documentation": "Delete deployment",
+      "responses": [
+        {
+          "label": "Deletion initiated successfully",
+          "body": "{\n  \"status\": \"deleting\",\n  \"message\": \"Deployment deletion initiated\"\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "bb9e1d7f-e678-412b-9982-9b64cba5ff0d",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Invalid drop request",
+          "body": "{\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"Cannot delete deployment with active connections\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "f50642c9-c91d-48c5-9336-4e3df2598565",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Unauthorized",
+          "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or expired token\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "49b9346c-23e5-4b37-a17e-744078314aec",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Deployment not found",
+          "body": "{\n  \"error\": {\n    \"code\": \"DEPLOYMENT_NOT_FOUND\",\n    \"message\": \"Deployment 'nonexistent-app' not found\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "bb1a4f3f-13af-4d58-8f19-462e0444478c",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "8b9375ec-47f7-4cdf-bdf1-584bdd4ed6fc",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "get",
+      "endpoint": "/env",
+      "documentation": "Get environment variables",
+      "responses": [
+        {
+          "label": "Environment variables retrieved successfully",
+          "body": "{\n  \"variables\": {\n    \"NODE_ENV\": \"production\",\n    \"DATABASE_URL\": \"postgresql://user:pass@postgres-myapp.deployaja.id:5432/myapp\",\n    \"POSTGRES_URL\": \"postgresql://user:pass@postgres-myapp.deployaja.id:5432/myapp\",\n    \"REDIS_URL\": \"redis://redis-myapp.deployaja.id:6379\",\n    \"RABBITMQ_URL\": \"amqp://rabbitmq-myapp.deployaja.id:5672\",\n    \"API_KEY\": \"sk_test_1234567890abcdef\",\n    \"JWT_SECRET\": \"your-jwt-secret-key\",\n    \"CORS_ORIGIN\": \"https://myapp.com\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "78dbf836-3085-4d5f-8806-5e49ab8715ed",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Unauthorized",
+          "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or expired token\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "3ecf0cd6-dd9b-4154-8fe9-3eec646b2660",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "368e896a-4f46-4f13-a32c-dfe509d4a561",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "get",
+      "endpoint": "logs/test/stream",
+      "documentation": "Get deployment logs",
+      "responses": [
+        {
+          "label": "Logs retrieved successfully",
+          "body": "{\n  \"logs\": [\n    {\n      \"timestamp\": \"2025-06-20T10:30:00Z\",\n      \"level\": \"info\",\n      \"message\": \"Server started on port 3000\",\n      \"source\": \"app\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:55Z\",\n      \"level\": \"info\",\n      \"message\": \"Connected to PostgreSQL database\",\n      \"source\": \"app\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:50Z\",\n      \"level\": \"info\",\n      \"message\": \"Connected to Redis cache\",\n      \"source\": \"app\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:45Z\",\n      \"level\": \"info\",\n      \"message\": \"Application container started\",\n      \"source\": \"app\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:40Z\",\n      \"level\": \"info\",\n      \"message\": \"PostgreSQL dependency is ready\",\n      \"source\": \"postgres\"\n    },\n    {\n      \"timestamp\": \"2025-06-20T10:29:35Z\",\n      \"level\": \"info\",\n      \"message\": \"Redis dependency is ready\",\n      \"source\": \"redis-cache\"\n    }\n  ]\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "d6eb7ef6-9b50-47fa-b272-1113fee90d79",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Switching to WebSocket for log streaming",
+          "body": "WebSocket upgrade response",
+          "headers": [
+            {
+              "key": "Upgrade",
+              "value": "websocket"
+            },
+            {
+              "key": "Connection",
+              "value": "Upgrade"
+            }
+          ],
+          "uuid": "b436eecd-22c7-45b8-bb78-d0d286cd9170",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Unauthorized",
+          "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or expired token\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "4acedfd4-f950-444c-b8b1-46a15f9c76fb",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Deployment not found",
+          "body": "{\n  \"error\": {\n    \"code\": \"DEPLOYMENT_NOT_FOUND\",\n    \"message\": \"Deployment 'nonexistent-app' not found\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "87e42495-f6d8-4e65-9688-d68d38844e8e",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "283ee926-df41-4497-be19-2c5f5c195415",
+      "type": "http",
+      "responseMode": null
+    },
+    {
+      "method": "put",
+      "endpoint": "/env",
+      "documentation": "Get environment variables",
+      "responses": [
+        {
+          "label": "Environment variables retrieved successfully",
+          "body": "{\n  \"variables\": {\n    \"NODE_ENV\": \"production\",\n    \"DATABASE_URL\": \"postgresql://user:pass@postgres-myapp.deployaja.id:5432/myapp\",\n    \"POSTGRES_URL\": \"postgresql://user:pass@postgres-myapp.deployaja.id:5432/myapp\",\n    \"REDIS_URL\": \"redis://redis-myapp.deployaja.id:6379\",\n    \"RABBITMQ_URL\": \"amqp://rabbitmq-myapp.deployaja.id:5672\",\n    \"API_KEY\": \"sk_test_1234567890abcdef\",\n    \"JWT_SECRET\": \"your-jwt-secret-key\",\n    \"CORS_ORIGIN\": \"https://myapp.com\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "b5d85f2c-558d-45c5-bb22-3aa2c497b261",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "label": "Unauthorized",
+          "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid or expired token\"\n  }\n}",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "uuid": "59f7cfca-dd19-429f-80c7-fb1bc425232a",
+          "latency": 0,
+          "statusCode": 200,
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "uuid": "9cd41ecd-01ad-49e3-aa3b-35d30834f809",
+      "type": "http",
+      "responseMode": null
+    }
+  ],
+  "proxyMode": false,
+  "uuid": "8afaeec1-ae2f-44ea-b7f0-623ba161d523",
+  "lastMigration": 32,
+  "endpointPrefix": "api/v1",
+  "latency": 0,
+  "hostname": "",
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "2d9fdcfb-7540-46f0-b202-a3f98317ee3e"
+    },
+    {
+      "type": "route",
+      "uuid": "e103b2bb-3dbb-4931-b81d-c54aafcab69a"
+    },
+    {
+      "type": "route",
+      "uuid": "51ba5ac2-de23-4f5c-8800-9166c019b2da"
+    },
+    {
+      "type": "route",
+      "uuid": "7f542999-cdd9-4213-b0b8-416daa4a2cf0"
+    },
+    {
+      "type": "route",
+      "uuid": "a84b5423-7c31-4b93-bbad-7e6ce753c0d5"
+    },
+    {
+      "type": "route",
+      "uuid": "a7d22d10-60e1-40f2-b29e-644a357f20d1"
+    },
+    {
+      "type": "route",
+      "uuid": "a50d07fd-81a5-4d84-9ee9-e4a1d847d7ed"
+    },
+    {
+      "type": "route",
+      "uuid": "5ef5e166-cc05-4588-a130-3d1f52a5753f"
+    },
+    {
+      "type": "route",
+      "uuid": "8b9375ec-47f7-4cdf-bdf1-584bdd4ed6fc"
+    },
+    {
+      "type": "route",
+      "uuid": "368e896a-4f46-4f13-a32c-dfe509d4a561"
+    },
+    {
+      "type": "route",
+      "uuid": "283ee926-df41-4497-be19-2c5f5c195415"
+    },
+    {
+      "type": "route",
+      "uuid": "9cd41ecd-01ad-49e3-aa3b-35d30834f809"
+    }
+  ],
+  "folders": [],
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [],
+  "proxyReqHeaders": [],
+  "proxyResHeaders": [],
+  "data": [],
+  "callbacks": []
+}
