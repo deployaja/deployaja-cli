@@ -16,7 +16,6 @@ func init() {
 }
 
 func deployCmd() *cobra.Command {
-	var buildFlag bool
 	var fileFlag string
 
 	cmd := &cobra.Command{
@@ -27,11 +26,9 @@ func deployCmd() *cobra.Command {
 				return err
 			}
 
-			// Validate Dockerfile exists if --build flag is used
-			if buildFlag {
-				if err := validateDockerfileExists(); err != nil {
-					return err
-				}
+			// Validate Dockerfile exists (required for deployment)
+			if err := validateDockerfileExists(); err != nil {
+				return err
 			}
 
 			// Load config from specified file or default
@@ -48,7 +45,7 @@ func deployCmd() *cobra.Command {
 
 			fmt.Printf("%s Deploying %s...\n", ui.InfoPrint("🚀"), cfg.Name)
 
-			response, err := apiClient.Deploy(cfg, buildFlag)
+			response, err := apiClient.Deploy(cfg, true)
 			if err != nil {
 				return err
 			}
@@ -68,7 +65,6 @@ func deployCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVar(&buildFlag, "build", false, "Build the application before deployment (requires Dockerfile)")
 	cmd.Flags().StringVarP(&fileFlag, "file", "f", "", "Path to deployment configuration file (default: deployaja.yaml)")
 
 	return cmd
@@ -79,7 +75,7 @@ func validateDockerfileExists() error {
 	dockerfilePath := filepath.Join(".", "Dockerfile")
 
 	if _, err := os.Stat(dockerfilePath); os.IsNotExist(err) {
-		return fmt.Errorf("%s Dockerfile not found in current directory. Use --build flag only when Dockerfile is present", ui.ErrorPrint("✗"))
+		return fmt.Errorf("%s Dockerfile not found in current directory. Dockerfile is required for deployment", ui.ErrorPrint("✗"))
 	}
 
 	return nil

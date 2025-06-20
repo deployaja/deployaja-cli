@@ -10,14 +10,13 @@ Aja is a powerful CLI tool that simplifies container deployment with managed dep
 
 ## ✨ Features
 
-- 🎯 **Zero Configuration** - Auto-inject connection strings for all dependencies
+- ⚡ **Quick Deploy from Marketplace** - Instantly install and launch popular apps with `aja install`
+- 🎯 **Managed Configuration** - Auto-inject connection strings for all dependencies
 - 💰 **Cost Forecasting** - See deployment costs before you deploy
 - 🔧 **Managed Dependencies** - PostgreSQL, Redis, MySQL, RabbitMQ, MongoDB, and more
 - 🚀 **One Command Deploy** - From code to production in seconds
 - 📊 **Real-time Monitoring** - Status, logs, and health checks
-- ⚡ **Instant Rollbacks** - Rollback to previous version with one command
-- 🌍 **Browser Authentication** - Secure OAuth flow
-- 🎨 **Beautiful CLI** - Colorized output and intuitive commands
+- 🔄 **Instant Rollbacks** - Rollback to previous version with one command
 
 ## 🚀 Quick Start
 
@@ -39,40 +38,43 @@ cd cli
 go build -o aja main.go
 ```
 
-### Deploy Your First App
-
-```bash
-# 1. Initialize configuration
-aja init
-
-# 2. Edit aja.yaml for your app
-vim deployaja.yaml
-
-# 3. Login to Aja
-aja login
-
-# 4. See deployment plan and costs
-aja plan
-
-# 5. Deploy existing image
-aja deploy
-
-# 5. Deploy! with Build Dockerfile and Push to internal repository 
-aja deploy --build
-```
-
 ## Deploy APP from marketplace
 
 ```bash
-# will create n8n.yaml in current dir
-# and deploy a container
-aja install n8n 
+# deploy n8n instantly for you
+# and will create n8n.yaml in current dir
+$ aja install n8n 
+
+📊 Deployment Status
+
+NAME          STATUS      REPLICAS   URL                                LAST DEPLOYED      
+-----------   ---------   --------   --------------------------------   -------------------
+n8n           deploying   1/1        https://02342.n8n.deployaja.id     2025-06-20 11:00:00
 
 # you can edit n8n deployment spec
-vim n8n.yaml
+$ vim n8n.yaml
 
 # redeploy the update
-aja deploy -f n8n.yaml
+$ aja deploy -f n8n.yaml
+```
+
+### Deploy Your Own App
+
+```bash
+# 1. Initialize configuration
+$ aja init
+
+# 2. Edit aja.yaml for your app
+$ vim deployaja.yaml
+
+# 3. Login to Aja
+$ aja login
+
+# 4. See costs plan
+$ aja plan
+
+# 5. Deploy
+$ aja deploy
 ```
 
 ## 📖 Usage Examples
