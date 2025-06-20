@@ -46,7 +46,7 @@ go build -o aja main.go
 aja init
 
 # 2. Edit aja.yaml for your app
-vim aja.yaml
+vim deployaja.yaml
 
 # 3. Login to Aja
 aja login
