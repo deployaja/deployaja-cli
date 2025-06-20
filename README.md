@@ -26,15 +26,15 @@ Aja is a powerful CLI tool that simplifies container deployment with managed dep
 #### Download Binary (Recommended)
 ```bash
 # macOS/Linux
-curl -sSL https://install.aja.id | bash
+curl -sSL https://install.deployaja.id | bash
 
 # Windows
-iwr -useb https://install.aja.id/windows | iex
+iwr -useb https://install.deployaja.id/windows | iex
 ```
 
 #### Build from Source
 ```bash
-git clone https://github.com/aja/cli.git
+git clone https://github.com/deployaja/deployaja-cli.git
 cd cli
 go build -o aja main.go
 ```
