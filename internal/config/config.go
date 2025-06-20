@@ -17,11 +17,15 @@ const (
 )
 
 func LoadDeploymentConfig() (*DeploymentConfig, error) {
-	if _, err := os.Stat(DeployFile); os.IsNotExist(err) {
-		return nil, fmt.Errorf("deployaja.yaml not found. Run 'deployaja init' to create one")
+	return LoadDeploymentConfigFromFile(DeployFile)
+}
+
+func LoadDeploymentConfigFromFile(filePath string) (*DeploymentConfig, error) {
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("deployment config file '%s' not found. Run 'deployaja init' to create one", filePath)
 	}
 
-	data, err := os.ReadFile(DeployFile)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}

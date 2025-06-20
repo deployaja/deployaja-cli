@@ -17,6 +17,7 @@ func init() {
 
 func deployCmd() *cobra.Command {
 	var buildFlag bool
+	var fileFlag string
 
 	cmd := &cobra.Command{
 		Use:   "deploy",
@@ -33,7 +34,14 @@ func deployCmd() *cobra.Command {
 				}
 			}
 
-			cfg, err := config.LoadDeploymentConfig()
+			// Load config from specified file or default
+			var cfg *config.DeploymentConfig
+			var err error
+			if fileFlag != "" {
+				cfg, err = config.LoadDeploymentConfigFromFile(fileFlag)
+			} else {
+				cfg, err = config.LoadDeploymentConfig()
+			}
 			if err != nil {
 				return err
 			}
@@ -61,6 +69,7 @@ func deployCmd() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&buildFlag, "build", false, "Build the application before deployment (requires Dockerfile)")
+	cmd.Flags().StringVarP(&fileFlag, "file", "f", "", "Path to deployment configuration file (default: deployaja.yaml)")
 
 	return cmd
 }

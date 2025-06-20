@@ -63,8 +63,16 @@ aja deploy --build
 
 ## Deploy APP from marketplace
 
-```
-aja install n8n
+```bash
+# will create n8n.yaml in current dir
+# and deploy a container
+aja install n8n 
+
+# you can edit n8n deployment spec
+vim n8n.yaml
+
+# redeploy the update
+aja deploy -f n8n.yaml
 ```
 
 ## 📖 Usage Examples
