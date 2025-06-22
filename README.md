@@ -563,6 +563,14 @@ volumes:
   - name: "app-storage"
     size: "1Gi"
     mountPath: "/app/data"
+# Optional    
+envMap:
+  db_host: WORDPRESS_DB_HOST
+  db_name: WORDPRESS_DB_NAME
+  db_user: WORDPRESS_DB_USER
+  db_password: WORDPRESS_DB_PASSWORD
+  db_pass: WORDPRESS_DB_PASSWORD
+
 ```
 
 ### Validation Rules
