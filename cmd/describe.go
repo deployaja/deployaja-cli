@@ -87,7 +87,80 @@ func printPodDescription(pod map[string]interface{}) {
 				if state, ok := c["state"].(map[string]interface{}); ok {
 					fmt.Printf("    State: %v\n", state)
 				}
+
+				// Print ports if available
+				if ports, ok := c["ports"].([]interface{}); ok && len(ports) > 0 {
+					fmt.Println("    Ports:")
+					for _, p := range ports {
+						if port, ok := p.(map[string]interface{}); ok {
+							containerPort := getValueOrNil(port["containerPort"])
+							protocol := getValueOrDefault(port["protocol"], "TCP")
+							name := getValueOrNil(port["name"])
+							hostPort := getValueOrNil(port["hostPort"])
+							fmt.Printf("      - Container Port: %v, Protocol: %v, Name: %v, Host Port: %v\n",
+								containerPort, protocol, name, hostPort)
+						}
+					}
+				}
+
+				// Print environment variables if available
+				if env, ok := c["environment"].([]interface{}); ok && len(env) > 0 {
+					fmt.Println("    Environment Variables:")
+					for _, e := range env {
+						if envVar, ok := e.(map[string]interface{}); ok {
+							name := getValueOrNil(envVar["name"])
+							value := getValueOrNil(envVar["value"])
+							fmt.Printf("      - %v = %v\n", name, value)
+
+							// Print valueFrom if available
+							if valueFrom, ok := envVar["valueFrom"].(map[string]interface{}); ok {
+								if configMapRef := getValueOrNil(valueFrom["configMapKeyRef"]); configMapRef != "<nil>" {
+									fmt.Printf("        (from ConfigMap: %v)\n", configMapRef)
+								}
+								if secretRef := getValueOrNil(valueFrom["secretKeyRef"]); secretRef != "<nil>" {
+									fmt.Printf("        (from Secret: %v)\n", secretRef)
+								}
+								if fieldRef := getValueOrNil(valueFrom["fieldRef"]); fieldRef != "<nil>" {
+									fmt.Printf("        (from Field: %v)\n", fieldRef)
+								}
+								if resourceFieldRef := getValueOrNil(valueFrom["resourceFieldRef"]); resourceFieldRef != "<nil>" {
+									fmt.Printf("        (from Resource Field: %v)\n", resourceFieldRef)
+								}
+							}
+						}
+					}
+				}
+
+				// Print volume mounts if available
+				if mounts, ok := c["volumeMounts"].([]interface{}); ok && len(mounts) > 0 {
+					fmt.Println("    Volume Mounts:")
+					for _, m := range mounts {
+						if mount, ok := m.(map[string]interface{}); ok {
+							name := getValueOrNil(mount["name"])
+							mountPath := getValueOrNil(mount["mountPath"])
+							readOnly := getValueOrDefault(mount["readOnly"], false)
+							fmt.Printf("      - Name: %v, Mount Path: %v, Read Only: %v\n",
+								name, mountPath, readOnly)
+						}
+					}
+				}
 			}
 		}
 	}
+}
+
+// Helper function to get value or return "<nil>"
+func getValueOrNil(value interface{}) string {
+	if value == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("%v", value)
+}
+
+// Helper function to get value or return default
+func getValueOrDefault(value interface{}, defaultValue interface{}) interface{} {
+	if value == nil {
+		return defaultValue
+	}
+	return value
 }
