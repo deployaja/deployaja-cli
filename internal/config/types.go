@@ -2,8 +2,7 @@ package config
 
 // DeploymentConfig represents the deployaja.yaml structure
 type DeploymentConfig struct {
-	Name        string `yaml:"name"`
-	Version     string `yaml:"version"`
+	Name        string `yaml:"name"`	
 	Description string `yaml:"description,omitempty"`
 
 	Container struct {

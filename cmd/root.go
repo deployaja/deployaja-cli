@@ -35,9 +35,6 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ~/.deployaja/config.yaml)")
-	rootCmd.PersistentFlags().Bool("no-color", false, "disable colored output")
 }
 
 func initConfig() {
@@ -53,8 +50,7 @@ func initConfig() {
 		os.MkdirAll(configPath, 0755)
 
 		viper.AddConfigPath(configPath)
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(config.ConfigFile)
+		viper.SetConfigType("yaml")		
 	}
 
 	viper.AutomaticEnv()

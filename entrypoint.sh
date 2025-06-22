@@ -18,10 +18,6 @@ echo "Project: $PROJECT_NAME"
 # Build the command
 CMD_ARGS=""
 
-if [ -n "$CONFIG_FILE" ] && [ "$CONFIG_FILE" != "null" ]; then
-    CMD_ARGS="$CMD_ARGS --config $CONFIG_FILE"
-fi
-
 if [ -n "$ENVIRONMENT" ] && [ "$ENVIRONMENT" != "null" ]; then
     CMD_ARGS="$CMD_ARGS --env $ENVIRONMENT"
 fi

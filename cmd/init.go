@@ -34,8 +34,7 @@ func initCmd() *cobra.Command {
 			appName := fmt.Sprintf("%s-%d-app", randomName, randomNumber)
 
 			cfg := config.DeploymentConfig{
-				Name:        appName,
-				Version:     "1.0.0",
+				Name:        appName,				
 				Description: "Simple web application with nginx and postgres",
 			}
 

@@ -22,7 +22,7 @@ func configCmd() *cobra.Command {
 		Short: "Manage CLI configuration",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			home, _ := os.UserHomeDir()
-			configPath := filepath.Join(home, config.ConfigDir, config.ConfigFile)
+			configPath := filepath.Join(home, config.ConfigDir)
 
 			fmt.Printf("Configuration file: %s\n", configPath)
 			fmt.Printf("Token file: %s\n", filepath.Join(home, config.ConfigDir, config.TokenFile))

@@ -21,7 +21,7 @@ func deployCmd() *cobra.Command {
 	var fileFlag string
 	var nameFlag string
 	var setFlags []string
-
+	var dryRun bool
 	cmd := &cobra.Command{
 		Use:   "deploy",
 		Short: "Deploy application to cloud",
@@ -56,19 +56,14 @@ func deployCmd() *cobra.Command {
 				return err
 			}
 
-			if err := validateDockerfileExists(); err != nil {
-				return err
-			}
-
 			fmt.Printf("%s Deploying %s...\n", ui.InfoPrint("🚀"), cfg.Name)
 
-			response, err := apiClient.Deploy(cfg, true)
+			response, err := apiClient.Deploy(cfg, dryRun)
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("%s %s\n", ui.SuccessPrint("✓"), response.Message)
-			fmt.Printf("Deployment ID: %s\n", response.DeploymentID)
+			fmt.Printf("%s %s\n", ui.SuccessPrint("✓"), response.Message)			
 
 			if response.EstimatedTime != "" {
 				fmt.Printf("Estimated time: %s\n", response.EstimatedTime)
@@ -85,7 +80,7 @@ func deployCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&fileFlag, "file", "f", "", "Path to deployment configuration file (required if deployaja.yaml doesn't exist)")
 	cmd.Flags().StringVarP(&nameFlag, "name", "n", "", "Override the API name for deployment")
 	cmd.Flags().StringSliceVar(&setFlags, "set", []string{}, "Set configuration values using dot notation (e.g., --set container.image=nginx:latest --set resources.replicas=3)")
-
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Dry run the deployment")
 	return cmd
 }
 
@@ -114,8 +109,6 @@ func setConfigValue(cfg *config.DeploymentConfig, path, value string) error {
 	switch parts[0] {
 	case "name":
 		cfg.Name = value
-	case "version":
-		cfg.Version = value
 	case "description":
 		cfg.Description = value
 	case "domain":

@@ -489,10 +489,9 @@ func (c *APIClient) UpdateEnvVars(vars map[string]string, deploymentName string)
 	return nil
 }
 
-func (c *APIClient) Rollback(name, version string) error {
+func (c *APIClient) Rollback(name string) error {
 	body := map[string]string{
-		"name":    name,
-		"version": version,
+		"deploymentName": name,
 	}
 
 	resp, err := c.makeRequest("POST", c.BaseURL+"/rollback", body)
@@ -666,7 +665,7 @@ func (c *APIClient) PublishApp(
 		"isActive":    true,
 	}
 
-	resp, err := c.makeAuthenticatedRequest("POST", c.BaseURL+"/apps/publish", reqBody)
+	resp, err := c.makeAuthenticatedRequest("POST", c.BaseURL+"/publish", reqBody)
 	if err != nil {
 		return nil, err
 	}

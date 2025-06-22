@@ -10,8 +10,7 @@ import (
 )
 
 const (
-	ConfigDir  = ".deployaja"
-	ConfigFile = "config.yaml"
+	ConfigDir  = ".deployaja"	
 	TokenFile  = "token"
 	DeployFile = "deployaja.yaml"
 )
