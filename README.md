@@ -744,6 +744,59 @@ aja deploy --help
 aja env --help
 ```
 
+## 🛠️ Shell Completion
+
+Aja supports shell completion for bash and zsh, enabling tab completion for commands, flags, and arguments.
+
+### Bash Completion
+
+Add completion to your bash profile:
+
+```bash
+# Generate completion script
+aja completion bash > ~/.aja-completion.bash
+
+# Add to your ~/.bashrc
+echo "source ~/.aja-completion.bash" >> ~/.bashrc
+
+# Reload your shell
+source ~/.bashrc
+```
+
+### Zsh Completion
+
+Add completion to your zsh profile:
+
+```bash
+# Generate completion script
+aja completion zsh > ~/.aja-completion.zsh
+
+# Add to your ~/.zshrc
+echo "source ~/.aja-completion.zsh" >> ~/.zshrc
+
+# Reload your shell
+source ~/.zshrc
+```
+
+### One-liner Setup
+
+For quick setup, you can use these one-liners:
+
+**Bash:**
+```bash
+aja completion bash > ~/.aja-completion.bash && echo "source ~/.aja-completion.bash" >> ~/.bashrc && source ~/.bashrc
+```
+
+**Zsh:**
+```bash
+aja completion zsh > ~/.aja-completion.zsh && echo "source ~/.aja-completion.zsh" >> ~/.zshrc && source ~/.zshrc
+```
+
+After setup, you can use tab completion for:
+- Commands: `aja de<TAB>` → `aja deploy`
+- Flags: `aja deploy --<TAB>` → shows available flags
+- App names: `aja logs <TAB>` → shows deployed apps
+
 ## 🌍 Environment Variables
 
 | Variable | Description | Default |
