@@ -37,7 +37,7 @@ type APIClient struct {
 func NewApiClient(token string) *APIClient {
 	baseUrl := os.Getenv("DEPLOYAJA_API_URL")
 	if baseUrl == "" {
-		baseUrl = "http://localhost:5173"
+		baseUrl = "https://deployaja.id"
 	}
 
 	client := &APIClient{
