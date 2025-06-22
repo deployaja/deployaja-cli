@@ -29,6 +29,7 @@ type DeploymentConfig struct {
 
 	Domain  string   `yaml:"domain,omitempty"`
 	Volumes []Volume `yaml:"volumes,omitempty"`
+	EnvMap  map[string]string `yaml:"envMap,omitempty"`
 }
 
 type Dependency struct {
