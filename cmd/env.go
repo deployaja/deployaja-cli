@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"deployaja-cli/internal/config"
 	"deployaja-cli/internal/ui"
 	"encoding/json"
 	"fmt"
@@ -16,10 +17,18 @@ func init() {
 }
 
 func envCmd() *cobra.Command {
+	var deploymentName string
+
 	cmd := &cobra.Command{
 		Use:   "env [edit|set|get]",
 		Short: "Manage environment variables",
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			if deploymentName == "" {
+				if cfg, err := config.LoadDeploymentConfig(); err == nil && cfg.Name != "" {
+					deploymentName = cfg.Name
+				}
+			}
 			if err := ensureAuthenticated(); err != nil {
 				return err
 			}
@@ -31,18 +40,18 @@ func envCmd() *cobra.Command {
 
 			switch action {
 			case "edit":
-				return editEnvVars()
+				return editEnvVars(deploymentName)
 			case "get":
 				key := ""
 				if len(args) > 1 {
 					key = args[1]
 				}
-				return getEnvVars(key)
+				return getEnvVars(key, deploymentName)
 			case "set":
 				if len(args) < 2 {
 					return fmt.Errorf("usage: deployaja env set KEY=VALUE")
 				}
-				return setEnvVar(args[1])
+				return setEnvVar(args[1], deploymentName)
 			default:
 				return fmt.Errorf("unknown action: %s", action)
 			}
@@ -52,9 +61,9 @@ func envCmd() *cobra.Command {
 	return cmd
 }
 
-func editEnvVars() error {
+func editEnvVars(deploymentName string) error {
 	// Get current env vars
-	envVars, err := apiClient.GetEnvVars()
+	envVars, err := apiClient.GetEnvVars(deploymentName)
 	if err != nil {
 		return err
 	}
@@ -102,11 +111,11 @@ func editEnvVars() error {
 	}
 
 	// Update env vars
-	return apiClient.UpdateEnvVars(modifiedEnvVars)
+	return apiClient.UpdateEnvVars(modifiedEnvVars, deploymentName)
 }
 
-func getEnvVars(key string) error {
-	envVars, err := apiClient.GetEnvVars()
+func getEnvVars(key string, deploymentName string) error {
+	envVars, err := apiClient.GetEnvVars(deploymentName)
 	if err != nil {
 		return err
 	}
@@ -126,7 +135,7 @@ func getEnvVars(key string) error {
 	return nil
 }
 
-func setEnvVar(keyValue string) error {
+func setEnvVar(keyValue string, deploymentName string) error {
 	parts := strings.SplitN(keyValue, "=", 2)
 	if len(parts) != 2 {
 		return fmt.Errorf("invalid format. Use KEY=VALUE")
@@ -136,7 +145,7 @@ func setEnvVar(keyValue string) error {
 		parts[0]: parts[1],
 	}
 
-	err := apiClient.UpdateEnvVars(envVars)
+	err := apiClient.UpdateEnvVars(envVars, deploymentName)
 	if err != nil {
 		return err
 	}

@@ -17,6 +17,7 @@ func init() {
 
 func deployCmd() *cobra.Command {
 	var fileFlag string
+	var nameFlag string
 
 	cmd := &cobra.Command{
 		Use:   "deploy",
@@ -26,17 +27,21 @@ func deployCmd() *cobra.Command {
 				return err
 			}
 
-
 			// Load config from specified file or default
 			var cfg *config.DeploymentConfig
 			var err error
 			if fileFlag != "" {
 				cfg, err = config.LoadDeploymentConfigFromFile(fileFlag)
-			} else {								
+			} else {
 				if err := validateDefaultConfigExists(); err != nil {
 					return err
-				}	
+				}
 				cfg, err = config.LoadDeploymentConfig()
+			}
+
+			// Override name if provided via flag
+			if nameFlag != "" {
+				cfg.Name = nameFlag
 			}
 
 			if err := validateDockerfileExists(); err != nil {
@@ -66,6 +71,7 @@ func deployCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&fileFlag, "file", "f", "", "Path to deployment configuration file (required if deployaja.yaml doesn't exist)")
+	cmd.Flags().StringVarP(&nameFlag, "name", "n", "", "Override the API name for deployment")
 
 	return cmd
 }

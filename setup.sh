@@ -43,4 +43,4 @@ go build -o aja main.go
 sudo cp aja /usr/local/bin/
 
 
-echo "DeployAja CLI installed successfully! Run 'deployaja --help' to get started."
+echo "DeployAja CLI installed successfully! Run 'aja --help' to get started."

@@ -22,7 +22,7 @@ func loginCmd() *cobra.Command {
 		Short: "Authenticate with DeployAja platform",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sessionCode := uuid.New().String()
-			loginURL := fmt.Sprintf("%s/login?ses=%s", apiClient.BaseURL, sessionCode)
+			loginURL := fmt.Sprintf("%s?ses=%s", apiClient.LoginURL, sessionCode)
 
 			fmt.Printf("%s Opening browser for authentication...\n", ui.InfoPrint("🔐"))
 			fmt.Printf("If browser doesn't open, visit: %s\n", loginURL)

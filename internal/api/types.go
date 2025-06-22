@@ -63,6 +63,15 @@ type DependencyInfo struct {
 	} `json:"specs"`
 }
 
+type DependencyInstanceResponse struct {
+	ID        string      `json:"id"`
+	UserID    string      `json:"userId"`
+	Type      string      `json:"type"`
+	Config    interface{} `json:"config"`
+	CreatedAt string      `json:"createdAt"`
+	UpdatedAt string      `json:"updatedAt"`
+}
+
 type ErrorResponse struct {
 	Error struct {
 		Code    string      `json:"code"`
@@ -78,13 +87,21 @@ type LogEntry struct {
 	Source    string `json:"source"`
 }
 
+type DescribeResponse struct {
+	Pod    map[string]interface{}   `json:"pod"`
+	Events []map[string]interface{} `json:"events"`
+}
+
 // Marketplace types
 type InstallResponse struct {
-	AppName    string `json:"appName"`
-	Config     string `json:"config"` // Base64 encoded YAML config
-	Message    string `json:"message"`
-	Status     string `json:"status"`
-	InstallURL string `json:"installUrl,omitempty"`
+	DeploymentID   string `json:"deploymentId"`
+	AppName        string `json:"appName"`
+	DeploymentName string `json:"deploymentName"`
+	Config         string `json:"config"` // Base64 encoded YAML config
+	Status         string `json:"status"`
+	Message        string `json:"message"`
+	EstimatedTime  string `json:"estimatedTime,omitempty"`
+	URL            string `json:"url,omitempty"`
 }
 
 type SearchResponse struct {
@@ -103,4 +120,40 @@ type MarketplaceApp struct {
 	Rating      float64  `json:"rating"`
 	Image       string   `json:"image,omitempty"`
 	Repository  string   `json:"repository,omitempty"`
+}
+
+type AppResponse struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Message     string `json:"message"`
+	Status      string `json:"status"`
+	PublishedAt string `json:"publishedAt,omitempty"`
+}
+
+// Validate types
+type ValidateResponse struct {
+	Valid    bool     `json:"valid"`
+	Message  string   `json:"message"`
+	Warnings []string `json:"warnings,omitempty"`
+}
+
+type ValidateErrorResponse struct {
+	Valid  bool              `json:"valid"`
+	Error  ErrorResponse     `json:"error"`
+	Errors []ValidationError `json:"errors,omitempty"`
+}
+
+type ValidationError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+	Code    string `json:"code,omitempty"`
+}
+
+// Gen types
+type GenRequest struct {
+	Prompt string `json:"prompt"`
+}
+
+type GenResponse struct {
+	Content string `json:"content"`
 }

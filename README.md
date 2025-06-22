@@ -6,7 +6,7 @@ Aja is a powerful CLI tool that simplifies container deployment with managed dep
 
 [![Go Version](https://img.shields.io/badge/go-1.20+-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Release](https://img.shields.io/badge/release-v1.0.0-brightgreen.svg)](https://github.com/aja/cli/releases)
+[![Release](https://img.shields.io/badge/release-beta-orange.svg)](https://github.com/deployaja/deployaja-cli/releases)
 
 ## ✨ Features
 
@@ -34,7 +34,7 @@ iwr -useb https://install.deployaja.id/windows | iex
 #### Build from Source
 ```bash
 git clone https://github.com/deployaja/deployaja-cli.git
-cd cli
+cd deployaja-cli
 go build -o aja main.go
 ```
 
@@ -64,7 +64,7 @@ $ aja deploy -f n8n.yaml
 # 1. Initialize configuration
 $ aja init
 
-# 2. Edit aja.yaml for your app
+# 2. Edit deployaja.yaml for your app
 $ vim deployaja.yaml
 
 # 3. Login to Aja
@@ -77,12 +77,48 @@ $ aja plan
 $ aja deploy
 ```
 
+## 🤖 AI-Powered Configuration Generation
+
+The `aja gen` command uses AI to generate deployment configurations based on natural language prompts. This makes it easier to create complex configurations without manually writing YAML.
+
+```bash
+# Generate a configuration for a Node.js API with PostgreSQL
+$ aja gen "create a nodejs api with postgresql database"
+
+🤖 Generating content...
+✅ Content written to /tmp/deployaja-gen-42.yaml
+📝 Opening vim...
+```
+
+The generated configuration will be saved to a temporary YAML file with a unique filename and automatically opened in vim for editing. You can then:
+
+1. Review and modify the generated configuration
+2. Save the file to your project directory
+3. Deploy using `aja deploy -f <filename>`
+
+### Example Prompts
+
+```bash
+# Simple web applications
+aja gen "n8n"
+aja gen "vault"
+aja gen "minecraft server"
+aja gen "nodejs express api with cors enabled"
+aja gen "python flask app with gunicorn"
+
+# Applications with databases
+aja gen "wordpress with mysql database"
+aja gen "django app with postgresql and redis"
+aja gen "rails app with postgres and sidekiq"
+
+```
+
 ## 📖 Usage Examples
 
 ### Basic Web Application
 
 ```yaml
-# aja.yaml
+# deployaja.yaml
 name: "my-web-app"
 version: "1.0.0"
 description: "My awesome web application"
@@ -171,13 +207,14 @@ Daily: IDR 1.500
 
 | Command | Description |
 |---------|-------------|
-| `aja init` | Create aja.yaml configuration |
+| `aja init` | Create deployaja.yaml configuration |
+| `aja gen PROMPT` | Generate aja configuration based on a prompt |
 | `aja validate` | Validate configuration file |
 | `aja plan` | Show deployment plan and costs |
 | `aja deploy` | Deploy application |
 | `aja status` | Check deployment health |
+| `aja describe NAME` | Describe deployment pod details (status, containers, events, etc.) |
 | `aja logs NAME` | View application logs |
-| `aja ls` | List all deployments |
 
 ### Management Commands
 
@@ -186,18 +223,18 @@ Daily: IDR 1.500
 | `aja env edit` | Edit environment variables in vim |
 | `aja env set KEY=VALUE` | Set environment variable |
 | `aja env get [KEY]` | Get environment variables |
-| `aja rollback NAME` | Rollback deployment |
 | `aja drop NAME` | Delete deployment |
 
 ### Utility Commands
 
 | Command | Description |
 |---------|-------------|
-| `aja deps` | List available dependencies |
+| `aja deps [instance]` | List available dependencies and versions |
 | `aja login` | Authenticate with platform |
 | `aja config` | Show configuration |
 | `aja search QUERY` | Search for apps in the marketplace |
 | `aja install APPNAME` | Install an app from the marketplace |
+| `aja install APPNAME -d DOMAIN` | Install an app with custom domain |
 
 ### Command Examples
 
@@ -211,11 +248,17 @@ aja logs my-app -f
 # Follow logs with specific tail count
 aja logs my-app --follow --tail=50
 
-# Check specific deployment status
-aja status my-web-app
+# Check deployment 
+aja status
+
+# Describe pod details with events
+aja describe my-app
 
 # List dependencies with pricing
 aja deps --type postgresql
+
+# List specific dependency instance details
+aja deps instance-name
 
 # Set environment variable
 aja env set DEBUG=true
@@ -230,6 +273,15 @@ aja search "node.js api"
 # Install app from marketplace
 aja install wordpress
 aja install react-app
+
+# Install app with custom domain
+aja install wordpress --domain myblog.example.com
+aja install react-app -d myapp.example.com
+
+# Generate configuration using AI
+aja gen "create a nodejs api with postgresql database"
+aja gen "docker configuration for wordpress with mysql"
+aja gen "deploy react app with redis cache"
 ```
 
 ### Logs Command Options
@@ -256,6 +308,80 @@ aja logs my-app --tail 20 -f
 **Available Flags:**
 - `--tail <number>`: Number of lines to show (default: 100)
 - `-f, --follow`: Follow log output in real-time
+
+### Describe Command
+
+The `aja describe` command provides detailed information about your deployment's pod, including its current state, containers, and events. This is useful for debugging deployment issues and understanding the current state of your application.
+
+```bash
+# Get detailed pod information
+aja describe my-app
+```
+
+The describe command shows:
+- **Pod Information**: Name, namespace, node, phase, IP addresses, and start time
+- **Pod Conditions**: Ready, initialized, scheduled status with reasons
+- **Container Details**: Image, ready state, restart count, and current state
+- **Pod Events**: Recent events like pulling images, starting containers, or error conditions
+
+Example output:
+```
+🔍 Fetching pod details for my-app...
+
+📦 Pod Description
+
+Name:        my-app-7d4f8b5c6d-xyz12
+Namespace:   default
+Node:        worker-node-1
+Phase:       Running
+Pod IP:      10.244.1.15
+Host IP:     192.168.1.10
+Start Time:  2024-01-15T10:30:00Z
+
+Conditions:
+  - Type: Ready, Status: True, Reason: , Message: 
+  - Type: Initialized, Status: True, Reason: , Message: 
+  - Type: PodScheduled, Status: True, Reason: , Message: 
+
+Containers:
+  - Name: my-app
+    Image: node:18-alpine
+    Ready: true
+    Restarts: 0
+    State: map[running:map[startedAt:2024-01-15T10:30:15Z]]
+
+📅 Pod Events
+
+- [Normal] Scheduled: Successfully assigned default/my-app-7d4f8b5c6d-xyz12 to worker-node-1
+- [Normal] Pulling: Pulling image "node:18-alpine"
+- [Normal] Pulled: Successfully pulled image "node:18-alpine"
+- [Normal] Created: Created container my-app
+- [Normal] Started: Started container my-app
+```
+
+### Dependencies Command
+
+The `aja deps` command allows you to explore available dependencies and their pricing, or get detailed information about specific dependency instances.
+
+```bash
+# List all available dependencies
+aja deps
+
+# Filter dependencies by type
+aja deps --type postgresql
+
+# Get detailed information about a specific dependency instance
+aja deps my-postgres-instance
+```
+
+**Available Flags:**
+- `--type <type>`: Filter dependencies by type (postgresql, redis, mysql, etc.)
+
+The command shows:
+- **Dependency Information**: Name, type, available versions, and default version
+- **Pricing Details**: Base cost per month, storage costs, and other pricing information
+- **Specifications**: CPU and memory requirements
+- **Instance Details**: When querying a specific instance, shows ID, user ID, configuration, and timestamps
 
 ## 🏪 Marketplace
 
@@ -306,12 +432,17 @@ Example output:
 ```bash
 # Install an app from marketplace
 aja install wordpress
+
+# Install an app with custom domain
+aja install wordpress --domain mywordpress.example.com
+aja install wordpress -d mywordpress.example.com
 ```
 
 This will:
 1. Download the app configuration from the marketplace
-2. Save it as `wordpress-install.json` in your current directory
-3. Display installation instructions
+2. Save it as `wordpress.yaml` in your current directory
+3. Configure custom domain for ingress URL (if specified)
+4. Display installation instructions
 
 Example output:
 ```
@@ -391,7 +522,7 @@ dependencies:
 
 ### CLI Configuration
 
-Location: `~/.aja/config.yaml`
+Location: `~/.deployaja/config.yaml`
 
 ```yaml
 api:
@@ -413,10 +544,10 @@ Aja uses browser-based OAuth for secure authentication:
 ```bash
 aja login
 # Opens browser for authentication
-# Token stored in ~/.aja/token
+# Token stored in ~/.deployaja/token
 ```
 
-## 🏗️ aja.yaml Reference
+## 🏗️ deployaja.yaml Reference
 
 ### Complete Configuration Example
 
@@ -490,14 +621,17 @@ volumes:
 **Authentication Errors**
 ```bash
 # Clear stored token and re-authenticate
-rm ~/.aja/token
+rm ~/.deployaja/token
 aja login
 ```
 
 **Deployment Failures**
 ```bash
 # Check deployment status
-aja status my-app
+aja status
+
+# Get detailed pod information and events
+aja describe my-app
 
 # View logs for errors
 aja logs my-app --tail=100
@@ -511,7 +645,7 @@ aja validate
 
 **Configuration Issues**
 ```bash
-# Validate aja.yaml
+# Validate deployaja.yaml
 aja validate
 
 # Check CLI configuration
@@ -587,8 +721,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md).
 
 ```bash
 # Clone repository
-git clone https://github.com/aja/cli.git
-cd cli
+git clone https://github.com/deployaja/deployaja-cli.git
+cd deployaja-cli
 
 # Install dependencies
 go mod tidy
@@ -621,14 +755,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: [docs.aja.id](https://docs.aja.id)
 - **API Reference**: [api.aja.id](https://api.aja.id)
 - **Support**: [support@aja.id](mailto:support@aja.id)
-- **GitHub**: [github.com/aja/cli](https://github.com/aja/cli)
+- **GitHub**: [github.com/deployaja/deployaja-cli](https://github.com/deployaja/deployaja-cli)
 
 ## ⭐ Support
 
 If you find Aja helpful, please:
 - ⭐ Star this repository
-- 🐛 Report bugs via [GitHub Issues](https://github.com/aja/cli/issues)
-- 💡 Request features via [GitHub Discussions](https://github.com/aja/cli/discussions)
+- 🐛 Report bugs via [GitHub Issues](https://github.com/deployaja/deployaja-cli/issues)
+- 💡 Request features via [GitHub Discussions](https://github.com/deployaja/deployaja-cli/discussions)
 - 📢 Share with your team
 
 ---

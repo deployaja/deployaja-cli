@@ -23,20 +23,29 @@ func validateCmd() *cobra.Command {
 				return err
 			}
 
-			// Basic validation
-			if cfg.Name == "" {
-				return fmt.Errorf("name is required")
+			// Use the global API client with proper authentication
+			// Call API to validate configuration
+			validateResp, err := apiClient.Validate(cfg)
+			if err != nil {
+				// If API validation fails, show the error
+				return fmt.Errorf("validation failed: %v", err)
 			}
 
-			if cfg.Container.Image == "" {
-				return fmt.Errorf("container.image is required")
+			if !validateResp.Valid {
+				return fmt.Errorf("configuration is invalid: %s", validateResp.Message)
 			}
 
-			if cfg.Container.Port == 0 {
-				return fmt.Errorf("container.port is required")
-			}
-
+			// Configuration is valid
 			fmt.Printf("%s Configuration is valid\n", ui.SuccessPrint("✓"))
+
+			// Show any warnings if present
+			if len(validateResp.Warnings) > 0 {
+				fmt.Println("\nWarnings:")
+				for _, warning := range validateResp.Warnings {
+					fmt.Printf("%s %s\n", ui.WarningPrint("⚠"), warning)
+				}
+			}
+
 			return nil
 		},
 	}

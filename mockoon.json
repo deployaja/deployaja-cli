@@ -993,6 +993,47 @@
       "uuid": "9cd41ecd-01ad-49e3-aa3b-35d30834f809",
       "type": "http",
       "responseMode": null
+    },
+    {
+      "uuid": "c4511ccd-b35d-4238-87e1-58b3f74fd884",
+      "type": "http",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "search",
+      "responses": [
+        {
+          "uuid": "96daffa2-65c5-4c0e-9ec7-74a49a1704f3",
+          "latency": 0,
+          "statusCode": 404,
+          "label": "",
+          "headers": [
+            {
+              "key": "content-security-policy",
+              "value": "default-src 'none'"
+            },
+            {
+              "key": "content-type",
+              "value": "text/html; charset=utf-8"
+            },
+            {
+              "key": "x-content-type-options",
+              "value": "nosniff"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
     }
   ],
   "proxyMode": false,
@@ -1049,6 +1090,10 @@
     {
       "type": "route",
       "uuid": "9cd41ecd-01ad-49e3-aa3b-35d30834f809"
+    },
+    {
+      "type": "route",
+      "uuid": "c4511ccd-b35d-4238-87e1-58b3f74fd884"
     }
   ],
   "folders": [],

@@ -16,17 +16,49 @@ func init() {
 
 func depsCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deps",
+		Use:   "deps [instance]",
 		Short: "List available dependencies and versions",
+		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			depType, _ := cmd.Flags().GetString("type")
+			var instance string
+			if len(args) > 0 {
+				instance = args[0]
+			}
 
+			depType, _ := cmd.Flags().GetString("type")
+			
+			if instance != "" {
+				response, err := apiClient.GetDependencyInstance()
+				if err != nil {
+					return err
+				}
+				fmt.Printf("%s Dependency Instance Details\n\n", ui.InfoPrint("🔍"))
+				for _, inst := range *response {
+					fmt.Printf("ID:        %v\n", inst.ID)
+					fmt.Printf("User ID:   %v\n", inst.UserID)
+					fmt.Printf("Type:      %v\n", inst.Type)
+					fmt.Printf("Created:   %v\n", inst.CreatedAt)
+					fmt.Printf("Updated:   %v\n", inst.UpdatedAt)
+					fmt.Printf("Config:\n")
+					// Pretty print config (assume it's a map or struct)
+					switch cfg := inst.Config.(type) {
+					case map[string]interface{}:
+						for k, v := range cfg {
+							fmt.Printf("  %s: %v\n", k, v)
+						}
+					default:
+						fmt.Printf("  %v\n", inst.Config)
+					}
+					fmt.Println()
+				}
+				return nil
+			} else {
+				fmt.Printf("%s Available Dependencies\n\n", ui.InfoPrint("🔧"))
+			}
 			response, err := apiClient.GetDependencies(depType)
 			if err != nil {
 				return err
 			}
-
-			fmt.Printf("%s Available Dependencies\n\n", ui.InfoPrint("🔧"))
 
 			for _, dep := range response.Dependencies {
 				fmt.Printf("%s\n", color.New(color.Bold).Sprint(dep.Name))

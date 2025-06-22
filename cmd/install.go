@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -17,6 +16,10 @@ func init() {
 }
 
 func installCmd() *cobra.Command {
+	var domain string
+	var dryRun bool
+	var name string
+
 	cmd := &cobra.Command{
 		Use:   "install [APPNAME]",
 		Short: "Install an app from the marketplace",
@@ -31,15 +34,30 @@ The configuration will be saved as APPNAME-install.json in the current directory
 			appName := args[0]
 
 			fmt.Printf("%s Installing %s from marketplace...\n", ui.InfoPrint("📦"), appName)
+			if domain != "" {
+				fmt.Printf("%s Using custom domain: %s\n", ui.InfoPrint("🌐"), domain)
+			}
+			if dryRun {
+				fmt.Printf("%s Dry run mode enabled\n", ui.InfoPrint("🔍"))
+			}
 
 			// Get app configuration from API
-			response, err := apiClient.InstallApp(appName)
+			response, err := apiClient.InstallApp(appName, domain, name, dryRun)
 			if err != nil {
 				return fmt.Errorf("failed to install app: %v", err)
 			}
+			// Check for successful installation (accept "success", "initiated", "pending" as successful)
+			successStatuses := []string{"success", "initiated", "pending", "deploying", "running", "validated"}
+			isSuccess := false
+			for _, status := range successStatuses {
+				if response.Status == status {
+					isSuccess = true
+					break
+				}
+			}
 
-			if response.Status != "success" {
-				return fmt.Errorf("installation failed: %s", response.Message)
+			if !isSuccess {
+				return fmt.Errorf("installation failed: %s (status: %s)", response.Message, response.Status)
 			}
 
 			// Decode the base64 config
@@ -48,38 +66,32 @@ The configuration will be saved as APPNAME-install.json in the current directory
 				return fmt.Errorf("failed to decode configuration: %v", err)
 			}
 
-			// Create install data structure
-			installData := map[string]interface{}{
-				"appName":    response.AppName,
-				"config":     string(configData),
-				"message":    response.Message,
-				"status":     response.Status,
-				"installUrl": response.InstallURL,
-			}
-
-			// Save to JSON file
-			filename := fmt.Sprintf("%s-install.json", appName)
-			jsonData, err := json.MarshalIndent(installData, "", "  ")
+			// Save config to YAML file
+			filename := fmt.Sprintf("%s.yaml", response.DeploymentName)
+			err = os.WriteFile(filename, configData, 0644)
 			if err != nil {
-				return fmt.Errorf("failed to marshal JSON: %v", err)
-			}
-
-			err = os.WriteFile(filename, jsonData, 0644)
-			if err != nil {
-				return fmt.Errorf("failed to write file: %v", err)
+				return fmt.Errorf("failed to write config file: %v", err)
 			}
 
 			absPath, _ := filepath.Abs(filename)
 			fmt.Printf("%s Configuration saved to: %s\n", ui.SuccessPrint("✅"), absPath)
 			fmt.Printf("%s %s\n", ui.InfoPrint("💡"), response.Message)
 
-			if response.InstallURL != "" {
-				fmt.Printf("%s Install URL: %s\n", ui.InfoPrint("🔗"), response.InstallURL)
+			if response.EstimatedTime != "" {
+				fmt.Printf("%s Estimated deployment time: %s\n", ui.InfoPrint("⏱️"), response.EstimatedTime)
+			}
+
+			if response.URL != "" {
+				fmt.Printf("%s Deployment URL: %s\n", ui.InfoPrint("🔗"), response.URL)
 			}
 
 			return nil
 		},
 	}
+
+	cmd.Flags().StringVarP(&domain, "domain", "d", "", "Custom domain for the ingress URL")
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Perform a dry run without actually installing")
+	cmd.Flags().StringVarP(&name, "name", "n", "", "Custom name for the deployment")
 
 	return cmd
 }

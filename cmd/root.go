@@ -66,7 +66,7 @@ func initConfig() {
 
 func ensureAuthenticated() error {
 	if apiClient.Token == "" {
-		return fmt.Errorf("not authenticated. Run 'deployaja login' first")
+		return fmt.Errorf("not authenticated. Run 'aja login' first")
 	}
 	return nil
 }

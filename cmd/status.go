@@ -14,19 +14,15 @@ func init() {
 
 func statusCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "status [NAME]",
-		Short: "Check deployment status and health",
+		Use:     "status",
+		Aliases: []string{"ls"},
+		Short:   "Check deployment status and health",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := ensureAuthenticated(); err != nil {
 				return err
 			}
 
-			var name string
-			if len(args) > 0 {
-				name = args[0]
-			}
-
-			response, err := apiClient.GetStatus(name)
+			response, err := apiClient.GetStatus()
 			if err != nil {
 				return err
 			}

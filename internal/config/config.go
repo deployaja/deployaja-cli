@@ -22,7 +22,7 @@ func LoadDeploymentConfig() (*DeploymentConfig, error) {
 
 func LoadDeploymentConfigFromFile(filePath string) (*DeploymentConfig, error) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("deployment config file '%s' not found. Run 'deployaja init' to create one", filePath)
+		return nil, fmt.Errorf("deployment config file '%s' not found. Run 'aja init' to create one", filePath)
 	}
 
 	data, err := os.ReadFile(filePath)

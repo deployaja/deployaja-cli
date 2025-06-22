@@ -14,7 +14,9 @@ func init() {
 }
 
 func planCmd() *cobra.Command {
-	return &cobra.Command{
+	var configFile string
+
+	cmd := &cobra.Command{
 		Use:   "plan",
 		Short: "Show deployment plan and cost forecasting",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -22,12 +24,20 @@ func planCmd() *cobra.Command {
 				return err
 			}
 
-			cfg, err := config.LoadDeploymentConfig()
+			var cfg *config.DeploymentConfig
+			var err error
+
+			if configFile != "" {
+				cfg, err = config.LoadDeploymentConfigFromFile(configFile)
+			} else {
+				cfg, err = config.LoadDeploymentConfig()
+			}
+
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("%s Calculating deployment costs...\\n", ui.InfoPrint("→"))
+			fmt.Printf("%s Calculating deployment costs...\n", ui.InfoPrint("→"))
 
 			response, err := apiClient.GetCostEstimate(cfg)
 			if err != nil {
@@ -49,21 +59,25 @@ func planCmd() *cobra.Command {
 
 			// Display costs
 			fmt.Printf("\n%s Cost Estimate\n", ui.InfoPrint("💰"))
-			fmt.Printf("Monthly: $%.2f %s\n", response.EstimatedCost.Monthly, response.EstimatedCost.Currency)
-			fmt.Printf("Daily: $%.2f %s\n", response.EstimatedCost.Daily, response.EstimatedCost.Currency)
+			fmt.Printf("Monthly: %s\n", ui.FormatCurrency(response.EstimatedCost.Monthly))
+			fmt.Printf("Daily: %s\n", ui.FormatCurrency(response.EstimatedCost.Daily))
 
 			fmt.Printf("\nBreakdown:\n")
-			fmt.Printf("  Compute: $%.2f\n", response.Breakdown.Compute)
-			fmt.Printf("  Storage: $%.2f\n", response.Breakdown.Storage)
-			fmt.Printf("  Network: $%.2f\n", response.Breakdown.Network)
+			fmt.Printf("  Compute: %s\n", ui.FormatCurrency(response.Breakdown.Compute))
+			fmt.Printf("  Storage: %s\n", ui.FormatCurrency(response.Breakdown.Storage))
+			fmt.Printf("  Network: %s\n", ui.FormatCurrency(response.Breakdown.Network))
 
 			if len(response.Breakdown.Dependencies) > 0 {
 				for name, cost := range response.Breakdown.Dependencies {
-					fmt.Printf("  %s: $%.2f\n", name, cost)
+					fmt.Printf("  %s: %s\n", name, ui.FormatCurrency(cost))
 				}
 			}
 
 			return nil
 		},
 	}
+
+	cmd.Flags().StringVarP(&configFile, "file", "f", "", "Path to custom deployment config file")
+
+	return cmd
 }

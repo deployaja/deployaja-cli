@@ -1,10 +1,31 @@
 package ui
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
 )
+
+// FormatCurrency formats a float64 value as Indonesian Rupiah
+func FormatCurrency(amount float64) string {
+	// Convert to string with 0 decimal places since IDR typically doesn't use decimals
+	amountStr := fmt.Sprintf("%.0f", amount)
+
+	// Add thousand separators (dots in Indonesian format)
+	// Start from the right and add dots every 3 digits
+	runes := []rune(amountStr)
+	var result []rune
+
+	for i, r := range runes {
+		if i > 0 && (len(runes)-i)%3 == 0 {
+			result = append(result, '.')
+		}
+		result = append(result, r)
+	}
+
+	return "Rp " + string(result)
+}
 
 func FormatTime(timeStr string) string {
 	t, err := time.Parse(time.RFC3339, timeStr)
