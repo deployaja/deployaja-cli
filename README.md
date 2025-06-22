@@ -1,22 +1,24 @@
-# [Draft - Not Live Yet] Aja (DeployAja) 🚀
+# DeployAja CLI 🚀
 
 > Deploy applications with managed dependencies in seconds, not hours.
 
-Aja is a powerful CLI tool that simplifies container deployment with managed dependencies like PostgreSQL, Redis, RabbitMQ, and more. Get your app running in the cloud with auto-injected environment variables and zero configuration overhead.
+DeployAja is a powerful CLI tool that simplifies container deployment with managed dependencies like PostgreSQL, Redis, RabbitMQ, and more. Get your app running in the cloud with auto-injected environment variables and zero configuration overhead.
 
-[![Go Version](https://img.shields.io/badge/go-1.20+-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/go-1.24+-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Release](https://img.shields.io/badge/release-beta-orange.svg)](https://github.com/deployaja/deployaja-cli/releases)
 
 ## ✨ Features
 
 - ⚡ **Quick Deploy from Marketplace** - Instantly install and launch popular apps with `aja install`
+- 🤖 **AI Configuration Generation** - Generate deployment configs with natural language prompts using `aja gen`
 - 🎯 **Managed Configuration** - Auto-inject connection strings for all dependencies
-- 💰 **Cost Forecasting** - See deployment costs before you deploy
+- 💰 **Cost Forecasting** - See deployment costs before you deploy with `aja plan`
 - 🔧 **Managed Dependencies** - PostgreSQL, Redis, MySQL, RabbitMQ, MongoDB, and more
 - 🚀 **One Command Deploy** - From code to production in seconds
 - 📊 **Real-time Monitoring** - Status, logs, and health checks
-- 🔄 **Instant Rollbacks** - Rollback to previous version with one command
+- 🔄 **Configuration Overrides** - Override any config value using `--set` flags
+- 🔍 **Pod Inspection** - Describe pod details, containers, and events
 
 ## 🚀 Quick Start
 
@@ -38,7 +40,7 @@ cd deployaja-cli
 go build -o aja main.go
 ```
 
-### Using Docker
+#### Using Docker
 ```bash
 docker pull ghcr.io/deployaja/deployaja-cli/aja
 ```
@@ -46,20 +48,23 @@ docker pull ghcr.io/deployaja/deployaja-cli/aja
 ## Deploy APP from marketplace
 
 ```bash
-# deploy n8n instantly for you
-# and will create n8n.yaml in current dir
+# Install n8n instantly
 $ aja install n8n 
 
-📊 Deployment Status
+📦 Installing n8n from marketplace...
+✅ Configuration saved to: /path/to/n8n.yaml
+💡 Review the configuration and run 'aja deploy' to deploy
 
-NAME          STATUS      REPLICAS   URL                                LAST DEPLOYED      
------------   ---------   --------   --------------------------------   -------------------
-n8n           deploying   1/1        https://02342.n8n.deployaja.id     2025-06-20 11:00:00
+# Install with custom domain
+$ aja install n8n --domain my-n8n.example.com
 
-# you can edit n8n deployment spec
+# Install with custom deployment name
+$ aja install n8n --name my-workflow-tool
+
+# You can edit the generated configuration
 $ vim n8n.yaml
 
-# redeploy the update
+# Deploy the app
 $ aja deploy -f n8n.yaml
 ```
 
@@ -72,7 +77,7 @@ $ aja init
 # 2. Edit deployaja.yaml for your app
 $ vim deployaja.yaml
 
-# 3. Login to Aja
+# 3. Login to DeployAja
 $ aja login
 
 # 4. See costs plan
@@ -84,7 +89,7 @@ $ aja deploy
 
 ## GitHub Action Usage
 
-This repository also provides a GitHub Action that you can use in your workflows to deploy applications using DeployAja CLI.
+This repository provides a GitHub Action that you can use in your workflows to deploy applications using DeployAja CLI.
 
 ### Quick Start
 
@@ -109,7 +114,18 @@ jobs:
           project-name: 'my-app'
 ```
 
-### Outputs
+### Action Inputs
+
+| Input | Description | Required | Default |
+|-------|-------------|----------|---------|
+| `command` | DeployAja command to execute | Yes | `status` |
+| `api-token` | DeployAja API token for authentication | No | - |
+| `config-file` | Path to DeployAja configuration file | No | `./deployaja.yaml` |
+| `environment` | Target environment for deployment | No | `production` |
+| `project-name` | Name of the project to deploy | No | - |
+| `additional-args` | Additional arguments to pass to the CLI | No | - |
+
+### Action Outputs
 
 | Output | Description |
 |--------|-------------|
@@ -149,111 +165,53 @@ jobs:
     additional-args: '--tail 100'
 ```
 
-#### Using Custom Configuration
-```yaml
-- name: Deploy with Custom Config
-  uses: deployaja/deployaja-cli@v1
-  with:
-    command: 'deploy'
-    config-file: './custom-deployaja.yaml'
-    api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
-```
-
-### Advanced Usage
-
-#### Matrix Deployments
-```yaml
-strategy:
-  matrix:
-    environment: [staging, production]
-    
-steps:
-  - name: Deploy to ${{ matrix.environment }}
-    uses: deployaja/deployaja-cli@v1
-    with:
-      command: 'deploy'
-      environment: ${{ matrix.environment }}
-      api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
-```
-
-#### Conditional Deployment
-```yaml
-- name: Deploy to Production
-  if: github.ref == 'refs/heads/main'
-  uses: deployaja/deployaja-cli@v1
-  with:
-    command: 'deploy'
-    environment: 'production'
-    api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
-```
-
-### Setup
-
-1. Add your DeployAja API token to your repository secrets as `DEPLOYAJA_API_TOKEN`
-2. Create a `deployaja.yaml` configuration file in your repository
-3. Use the action in your workflow as shown above
-
-
 ## 📖 Usage Examples
 
 ### Basic Web Application
 
 ```yaml
 # deployaja.yaml
-name: "my-web-app"
-version: "1.0.0"
-description: "My awesome web application"
+name: "bima-42-app"
+description: "Simple web application with nginx and postgres"
 
 container:
-  image: "node:18-alpine"
-  port: 3000
+  image: "nginx:latest"
+  port: 80
 
 resources:
-  cpu: "200m"
-  memory: "256Mi"
+  cpu: "500m"
+  memory: "1Gi"
   replicas: 2
 
 dependencies:
   - name: "postgres"
-    type: "postgresql"
+    type: "database"
     version: "15"
-    storage_size: "1" # 1Gb 
+    storage: "1Gi"
 
 env:
   - name: "NODE_ENV"
     value: "production"
-  - name: "PORT"
-    value: "3000"
+  - name: "LOG_LEVEL"
+    value: "info"
 
 healthCheck:
-  path: "/health"
-  port: 3000
-  initialDelaySeconds: 30
-  periodSeconds: 10
+  path: "/api/health"
+  port: 8080
+  initialDelaySeconds: 60
+  periodSeconds: 30
+
+domain: "bima42.deployaja.id"
+
+volumes:
+  - name: "app-storage"
+    size: "1Gi"
+    mountPath: "/usr/share/nginx/html"
 ```
 
 ## Auto-Injected Environment Variables
 
-When you deploy the above configuration, your application automatically receives:
-
-```bash
-# Database connection
-POSTGRES_URL=postgresql://user:pass@postgres-myapp.aja.id:5432/myapp_db
-POSTGRES_HOST=postgres-myapp.aja.id
-POSTGRES_PORT=5432
-POSTGRES_DB=myapp_db
-POSTGRES_USER=auto_generated_user
-POSTGRES_PASSWORD=auto_generated_password
-
-# Redis connection  
-REDIS_URL=redis://redis-myapp.aja.id:6379/0
-REDIS_HOST=redis-myapp.aja.id
-REDIS_PORT=6379
-
-# Your custom variables
-NODE_ENV=production
-PORT=3000
-```
+When you deploy with dependencies, your application automatically receives connection strings and configuration variables for all managed services.
 
 ### Cost Planning
 
@@ -262,16 +220,20 @@ $ aja plan
 
 📋 Deployment Plan
 Application: my-web-app
-Image: node:18-alpine
+Image: nginx:latest
 Replicas: 2
 
 Dependencies:
-  - postgres (postgresql 15)
-  - redis (redis 7)
+  - postgres (database 15)
 
 💰 Cost Estimate
-Monthly: IDR 45.500
-Daily: IDR 1.500
+Monthly: $45.50
+Daily: $1.50
+
+Breakdown:
+  Compute: $25.00
+  Storage: $15.00
+  Network: $5.50
 ```
 
 ## 🔧 Commands
@@ -280,12 +242,12 @@ Daily: IDR 1.500
 
 | Command | Description |
 |---------|-------------|
-| `aja init` | Create deployaja.yaml configuration |
-| `aja gen PROMPT` | Generate aja configuration based on a prompt |
+| `aja init` | Create deployaja.yaml configuration with random Wayang-inspired name |
+| `aja gen PROMPT` | Generate deployment configuration using AI based on natural language prompt |
 | `aja validate` | Validate configuration file |
 | `aja plan` | Show deployment plan and costs |
 | `aja deploy` | Deploy application |
-| `aja status` | Check deployment health |
+| `aja status` | Check deployment health and status |
 | `aja describe NAME` | Describe deployment pod details (status, containers, events, etc.) |
 | `aja logs NAME` | View application logs |
 
@@ -293,51 +255,70 @@ Daily: IDR 1.500
 
 | Command | Description |
 |---------|-------------|
-| `aja env edit` | Edit environment variables in vim |
-| `aja env set KEY=VALUE` | Set environment variable |
-| `aja env get [KEY]` | Get environment variables |
+| `aja env [edit\|set\|get]` | Manage environment variables |
 | `aja drop NAME` | Delete deployment |
+| `aja rollback NAME` | Rollback to previous version |
 
 ### Utility Commands
 
 | Command | Description |
 |---------|-------------|
 | `aja deps [instance]` | List available dependencies and versions |
-| `aja login` | Authenticate with platform |
+| `aja login` | Authenticate with platform using browser OAuth |
 | `aja config` | Show configuration |
 | `aja search QUERY` | Search for apps in the marketplace |
 | `aja install APPNAME` | Install an app from the marketplace |
-| `aja install APPNAME -d DOMAIN` | Install an app with custom domain |
+| `aja publish` | Publish your app to the marketplace |
+| `aja version` | Show CLI version |
 
 ### Command Examples
 
 ```bash
-# Deploy with dry run
+# Deploy with configuration overrides
+aja deploy --set container.image=nginx:alpine --set resources.replicas=3
+
+# Deploy with custom config file
+aja deploy --file my-custom-config.yaml
+
+# Deploy with custom name override
+aja deploy --name my-production-app
+
+# Dry run deployment
 aja deploy --dry-run
 
 # Follow logs in real-time
-aja logs my-app -f
+aja logs my-app --follow
 
 # Follow logs with specific tail count
-aja logs my-app --follow --tail=50
+aja logs my-app --tail 50 -f
 
-# Check deployment 
+# Check all deployments
 aja status
 
 # Describe pod details with events
 aja describe my-app
 
 # List dependencies with pricing
-aja deps --type postgresql
+aja deps --type database
 
-# List specific dependency instance details
-aja deps instance-name
+# Get specific dependency instance details
+aja deps my-postgres-instance
+
+# Edit environment variables in vim
+aja env edit
 
 # Set environment variable
 aja env set DEBUG=true
 
-# Force delete without confirmation
-aja drop my-app --force
+# Get all environment variables
+aja env get
+
+# Get specific environment variable
+aja env get DEBUG
+
+# Generate configuration with AI
+aja gen "create a nodejs api with postgresql database"
+aja gen "docker configuration for wordpress with mysql"
 
 # Search for apps in marketplace
 aja search wordpress
@@ -345,16 +326,10 @@ aja search "node.js api"
 
 # Install app from marketplace
 aja install wordpress
-aja install react-app
+aja install react-app --domain myapp.example.com --name my-react-app
 
-# Install app with custom domain
-aja install wordpress --domain myblog.example.com
-aja install react-app -d myapp.example.com
-
-# Generate configuration using AI
-aja gen "create a nodejs api with postgresql database"
-aja gen "docker configuration for wordpress with mysql"
-aja gen "deploy react app with redis cache"
+# Publish your app to marketplace
+aja publish
 ```
 
 ### Logs Command Options
@@ -368,11 +343,9 @@ aja logs my-app
 # Show specific number of lines
 aja logs my-app --tail 50
 
-# Follow logs in real-time (short form)
-aja logs my-app -f
-
-# Follow logs in real-time (long form)
+# Follow logs in real-time
 aja logs my-app --follow
+aja logs my-app -f
 
 # Combine options - follow last 20 lines
 aja logs my-app --tail 20 -f
@@ -382,83 +355,56 @@ aja logs my-app --tail 20 -f
 - `--tail <number>`: Number of lines to show (default: 100)
 - `-f, --follow`: Follow log output in real-time
 
+### Environment Variables Management
+
+The `aja env` command provides comprehensive environment variable management:
+
+```bash
+# Interactive editing in vim
+aja env edit
+
+# Set a single variable
+aja env set API_KEY=your-secret-key
+
+# Get all variables
+aja env get
+
+# Get specific variable
+aja env get API_KEY
+```
+
 ### Describe Command
 
-The `aja describe` command provides detailed information about your deployment's pod, including its current state, containers, and events. This is useful for debugging deployment issues and understanding the current state of your application.
+The `aja describe` command provides detailed information about your deployment's pod, including:
+
+- **Pod Information**: Name, namespace, node, phase, IP addresses, and start time
+- **Pod Conditions**: Ready, initialized, scheduled status with reasons  
+- **Container Details**: Image, ready state, restart count, ports, environment variables, and volume mounts
+- **Pod Events**: Recent events like pulling images, starting containers, or error conditions
 
 ```bash
 # Get detailed pod information
 aja describe my-app
 ```
 
-The describe command shows:
-- **Pod Information**: Name, namespace, node, phase, IP addresses, and start time
-- **Pod Conditions**: Ready, initialized, scheduled status with reasons
-- **Container Details**: Image, ready state, restart count, and current state
-- **Pod Events**: Recent events like pulling images, starting containers, or error conditions
-
-Example output:
-```
-🔍 Fetching pod details for my-app...
-
-📦 Pod Description
-
-Name:        my-app-7d4f8b5c6d-xyz12
-Namespace:   default
-Node:        worker-node-1
-Phase:       Running
-Pod IP:      10.244.1.15
-Host IP:     192.168.1.10
-Start Time:  2024-01-15T10:30:00Z
-
-Conditions:
-  - Type: Ready, Status: True, Reason: , Message: 
-  - Type: Initialized, Status: True, Reason: , Message: 
-  - Type: PodScheduled, Status: True, Reason: , Message: 
-
-Containers:
-  - Name: my-app
-    Image: node:18-alpine
-    Ready: true
-    Restarts: 0
-    State: map[running:map[startedAt:2024-01-15T10:30:15Z]]
-
-📅 Pod Events
-
-- [Normal] Scheduled: Successfully assigned default/my-app-7d4f8b5c6d-xyz12 to worker-node-1
-- [Normal] Pulling: Pulling image "node:18-alpine"
-- [Normal] Pulled: Successfully pulled image "node:18-alpine"
-- [Normal] Created: Created container my-app
-- [Normal] Started: Started container my-app
-```
-
 ### Dependencies Command
 
-The `aja deps` command allows you to explore available dependencies and their pricing, or get detailed information about specific dependency instances.
+The `aja deps` command allows you to explore available dependencies and their pricing:
 
 ```bash
 # List all available dependencies
 aja deps
 
 # Filter dependencies by type
-aja deps --type postgresql
+aja deps --type database
 
 # Get detailed information about a specific dependency instance
 aja deps my-postgres-instance
 ```
 
-**Available Flags:**
-- `--type <type>`: Filter dependencies by type (postgresql, redis, mysql, etc.)
-
-The command shows:
-- **Dependency Information**: Name, type, available versions, and default version
-- **Pricing Details**: Base cost per month, storage costs, and other pricing information
-- **Specifications**: CPU and memory requirements
-- **Instance Details**: When querying a specific instance, shows ID, user ID, configuration, and timestamps
-
 ## 🏪 Marketplace
 
-The Aja marketplace provides pre-configured applications that you can deploy with a single command. Browse, search, and install applications from the community.
+The DeployAja marketplace provides pre-configured applications that you can deploy with a single command.
 
 ### Searching Apps
 
@@ -466,11 +412,8 @@ The Aja marketplace provides pre-configured applications that you can deploy wit
 # Search by name
 aja search wordpress
 
-# Search by description
+# Search by description or tags
 aja search "node.js api"
-
-# Search by category
-aja search "blog"
 ```
 
 Example output:
@@ -488,15 +431,6 @@ Example output:
    Rating: 4.8/5.0
    Tags: cms, blog, php, mysql
 
-2 WordPress with WooCommerce
-   WordPress with e-commerce capabilities
-   Category: E-commerce
-   Author: Automattic
-   Version: 8.5
-   Downloads: 8920
-   Rating: 4.6/5.0
-   Tags: cms, ecommerce, woocommerce, php
-
 💡 Use 'aja install <app-name>' to install an app
 ```
 
@@ -506,89 +440,55 @@ Example output:
 # Install an app from marketplace
 aja install wordpress
 
-# Install an app with custom domain
+# Install with custom domain
 aja install wordpress --domain mywordpress.example.com
-aja install wordpress -d mywordpress.example.com
+
+# Install with custom deployment name  
+aja install wordpress --name my-blog --domain blog.example.com
+
+# Dry run installation
+aja install wordpress --dry-run
 ```
 
 This will:
 1. Download the app configuration from the marketplace
 2. Save it as `wordpress.yaml` in your current directory
-3. Configure custom domain for ingress URL (if specified)
-4. Display installation instructions
-
-Example output:
-```
-📦 Installing wordpress from marketplace...
-✅ Configuration saved to: /path/to/wordpress-install.json
-💡 Review the configuration and run 'aja deploy' to deploy
-🔗 Install URL: https://marketplace.aja.id/apps/wordpress
-```
-
-The generated JSON file contains:
-- App configuration in YAML format
-- Installation instructions
-- Metadata about the app
-
-### Available App Categories
-
-- **CMS**: Content Management Systems (WordPress, Drupal, etc.)
-- **E-commerce**: Online stores (WooCommerce, Shopify, etc.)
-- **Blog**: Blogging platforms (Ghost, Jekyll, etc.)
-- **API**: Backend APIs (Node.js, Python, Go, etc.)
-- **Frontend**: Single Page Applications (React, Vue, Angular, etc.)
-- **Database**: Database applications (phpMyAdmin, pgAdmin, etc.)
-- **Monitoring**: Monitoring tools (Grafana, Prometheus, etc.)
-- **Development**: Development tools (GitLab, Jenkins, etc.)
+3. Configure custom domain and name if specified
+4. Display installation instructions and estimated deployment time
 
 ## 🗃️ Supported Dependencies
 
-| Service | Versions | Auto-Injected Variables |
-|---------|----------|------------------------|
-| **PostgreSQL** | 13, 14, 15, 16 | `POSTGRES_URL`, `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` |
-| **MySQL** | 5.7, 8.0 | `MYSQL_URL`, `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD` |
-| **Redis** | 6, 7 | `REDIS_URL`, `REDIS_HOST`, `REDIS_PORT` |
-| **RabbitMQ** | 3.11, 3.12 | `RABBITMQ_URL`, `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USER`, `RABBITMQ_PASSWORD` |
-| **MongoDB** | 5.0, 6.0, 7.0 | `MONGODB_URL`, `MONGODB_HOST`, `MONGODB_PORT`, `MONGODB_DATABASE`, `MONGODB_USER`, `MONGODB_PASSWORD` |
-| **Elasticsearch** | 7.17, 8.8 | `ELASTICSEARCH_URL`, `ELASTICSEARCH_HOST`, `ELASTICSEARCH_PORT` |
-| **Memcached** | 1.6 | `MEMCACHED_HOST`, `MEMCACHED_PORT` |
+Dependencies are automatically configured with connection strings and environment variables:
+
+| Service | Type | Versions | Auto-Injected Variables |
+|---------|------|----------|------------------------|
+| **PostgreSQL** | `database` | 13, 14, 15, 16 | Connection strings and credentials |
+| **MySQL** | `database` | 5.7, 8.0 | Connection strings and credentials |
+| **Redis** | `cache` | 6, 7 | Connection URLs and endpoints |
+| **RabbitMQ** | `queue` | 3.11, 3.12 | Connection URLs and credentials |
+| **MongoDB** | `database` | 5.0, 6.0, 7.0 | Connection strings and credentials |
 
 ### Dependency Configuration Examples
 
 ```yaml
 dependencies:
-  # PostgreSQL with custom database
-  - name: "postgres"
-    type: "postgresql"
+  # PostgreSQL database
+  - name: "postgres"  
+    type: "database"
     version: "15"
-    config:
-      database: "myapp_production"
-      username: "myapp_user"
-      storage: "5Gi"
+    storage: "5Gi"
 
-  # Redis with persistence
+  # Redis cache
   - name: "cache"
-    type: "redis"
+    type: "cache" 
     version: "7"
-    config:
-      storage: "1Gi"
-      maxMemory: "512mb"
+    storage: "1Gi"
 
-  # RabbitMQ with management interface
+  # RabbitMQ message queue
   - name: "queue"
-    type: "rabbitmq"
+    type: "queue"
     version: "3.12"
-    config:
-      username: "admin"
-      storage: "2Gi"
-
-  # MongoDB cluster
-  - name: "mongodb"
-    type: "mongodb"
-    version: "7.0"
-    config:
-      database: "myapp_db"
-      storage: "10Gi"
+    storage: "2Gi"
 ```
 
 ## ⚙️ Configuration
@@ -597,27 +497,21 @@ dependencies:
 
 Location: `~/.deployaja/config.yaml`
 
-```yaml
-api:
-  baseUrl: "https://aja.id/api/v1"
-  timeout: 30s
-
-output:
-  format: "table"  # table, json, yaml
-  colorEnabled: true
-
-defaults:
-  region: "us-east-1"
-```
+Authentication token is stored in: `~/.deployaja/token`
 
 ### Authentication
 
-Aja uses browser-based OAuth for secure authentication:
+DeployAja uses browser-based OAuth for secure authentication:
 
 ```bash
 aja login
 # Opens browser for authentication
-# Token stored in ~/.deployaja/token
+# Token stored securely in ~/.deployaja/token
+```
+
+You can also set the token via environment variable:
+```bash
+export DEPLOYAJA_TOKEN=your-token-here
 ```
 
 ## 🏗️ deployaja.yaml Reference
@@ -626,30 +520,26 @@ aja login
 
 ```yaml
 # Application metadata
-name: "my-application"           # Required: Application name
-version: "1.0.0"                # Required: Version
-description: "My awesome app"    # Optional: Description
+name: "arjuna-23-app"              # Required: Application name
+description: "My awesome app"       # Optional: Description
 
 # Container configuration
 container:
-  image: "node:18-alpine"        # Required: Docker image
-  port: 3000                     # Required: Container port
+  image: "node:18-alpine"          # Required: Docker image
+  port: 3000                       # Required: Container port
 
 # Resource requirements  
 resources:
-  cpu: "200m"                    # CPU request (millicores)
-  memory: "256Mi"                # Memory request
-  replicas: 2                    # Number of instances
+  cpu: "500m"                      # CPU request (millicores)
+  memory: "1Gi"                    # Memory request
+  replicas: 2                      # Number of instances
 
 # Dependencies (managed services)
 dependencies:
   - name: "postgres"
-    type: "postgresql" 
+    type: "database"
     version: "15"
-    config:
-      database: "myapp_db"
-      username: "myapp_user"
-      storage: "2Gi"
+    storage: "2Gi"
 
 # Environment variables
 env:
@@ -660,27 +550,24 @@ env:
 
 # Health checks
 healthCheck:
-  path: "/health"                # Health check endpoint
-  port: 3000                     # Port for health checks
-  initialDelaySeconds: 30        # Delay before first check
-  periodSeconds: 10              # Check interval
+  path: "/api/health"              # Health check endpoint
+  port: 8080                       # Port for health checks
+  initialDelaySeconds: 60          # Delay before first check
+  periodSeconds: 30                # Check interval
 
 # Optional: Custom domain
-domain: "myapp.example.com"
+domain: "arjuna23.deployaja.id"
 
 # Optional: Persistent storage
 volumes:
-  - name: "uploads"
-    size: "5Gi"
-    mountPath: "/app/uploads"
-  - name: "logs"
-    size: "1Gi" 
-    mountPath: "/var/log"
+  - name: "app-storage"
+    size: "1Gi"
+    mountPath: "/app/data"
 ```
 
 ### Validation Rules
 
-- `name`: Required, alphanumeric with hyphens
+- `name`: Required, automatically generated with Wayang mythology names if using `aja init`
 - `container.image`: Required, valid Docker image reference
 - `container.port`: Required, valid port number (1-65535)
 - `resources.cpu`: Valid CPU request (e.g., "100m", "0.5", "1")
@@ -723,6 +610,9 @@ aja validate
 
 # Check CLI configuration
 aja config
+
+# Test with dry run
+aja deploy --dry-run
 ```
 
 ### Debug Mode
@@ -742,102 +632,42 @@ aja --help
 # Command-specific help
 aja deploy --help
 aja env --help
+aja logs --help
 ```
-
-## 🛠️ Shell Completion
-
-Aja supports shell completion for bash and zsh, enabling tab completion for commands, flags, and arguments.
-
-### Bash Completion
-
-Add completion to your bash profile:
-
-```bash
-# Generate completion script
-aja completion bash > ~/.aja-completion.bash
-
-# Add to your ~/.bashrc
-echo "source ~/.aja-completion.bash" >> ~/.bashrc
-
-# Reload your shell
-source ~/.bashrc
-```
-
-### Zsh Completion
-
-Add completion to your zsh profile:
-
-```bash
-# Generate completion script
-aja completion zsh > ~/.aja-completion.zsh
-
-# Add to your ~/.zshrc
-echo "source ~/.aja-completion.zsh" >> ~/.zshrc
-
-# Reload your shell
-source ~/.zshrc
-```
-
-### One-liner Setup
-
-For quick setup, you can use these one-liners:
-
-**Bash:**
-```bash
-aja completion bash > ~/.aja-completion.bash && echo "source ~/.aja-completion.bash" >> ~/.bashrc && source ~/.bashrc
-```
-
-**Zsh:**
-```bash
-aja completion zsh > ~/.aja-completion.zsh && echo "source ~/.aja-completion.zsh" >> ~/.zshrc && source ~/.zshrc
-```
-
-After setup, you can use tab completion for:
-- Commands: `aja de<TAB>` → `aja deploy`
-- Flags: `aja deploy --<TAB>` → shows available flags
-- App names: `aja logs <TAB>` → shows deployed apps
 
 ## 🌍 Environment Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DEPLOYAJA_TOKEN` | Set token with env |
+| `DEPLOYAJA_TOKEN` | API token for authentication | - |
+| `DEPLOYAJA_API_TOKEN` | Alternative API token variable | - |
 | `AJA_DEBUG` | Enable debug logging | `false` |
 | `NO_COLOR` | Disable colored output | `false` |
 
-## 📊 Cost Optimization
+## 💰 Cost Optimization
 
 ### Tips for Reducing Costs
 
 1. **Right-size Resources**
    ```yaml
    resources:
-     cpu: "100m"     # Start small
-     memory: "128Mi" # Scale up as needed
+     cpu: "200m"     # Start small
+     memory: "256Mi" # Scale up as needed
      replicas: 1     # Single instance for dev
    ```
 
 2. **Optimize Dependencies**
    ```yaml
    dependencies:
-     - name: "redis"
-       type: "redis"
-       config:
-         storage: "256Mi"  # Minimal storage for cache
+     - name: "cache"
+       type: "cache"
+       storage: "256Mi"  # Minimal storage for cache
    ```
 
 3. **Use Cost Planning**
    ```bash
    aja plan  # Always check costs first
    ```
-
-## 🔐 Security
-
-- **Secure Authentication**: Browser-based OAuth with JWT tokens
-- **Encrypted Transit**: All API calls use HTTPS
-- **Secret Management**: Auto-generated credentials for dependencies
-- **Network Isolation**: Dependencies isolated per deployment
-- **Regular Updates**: Dependencies automatically patched
 
 ## 🤝 Contributing
 
@@ -868,8 +698,9 @@ go build -o aja main.go
 - [Cobra](https://github.com/spf13/cobra) - CLI framework
 - [Viper](https://github.com/spf13/viper) - Configuration management
 - [Color](https://github.com/fatih/color) - Colored terminal output
-- [Browser](https://github.com/pkg/browser) - Browser launching
+- [Browser](https://github.com/pkg/browser) - Browser launching for OAuth
 - [UUID](https://github.com/google/uuid) - UUID generation
+- [YAML](https://gopkg.in/yaml.v3) - YAML parsing
 
 ## 📄 License
 
@@ -877,15 +708,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- **Website**: [aja.id](https://aja.id)
-- **Documentation**: [docs.aja.id](https://docs.aja.id)
-- **API Reference**: [api.aja.id](https://api.aja.id)
-- **Support**: [support@aja.id](mailto:support@aja.id)
+- **Website**: [deployaja.id](https://deployaja.id)
+- **Documentation**: [docs.deployaja.id](https://docs.deployaja.id)
+- **API Reference**: [api.deployaja.id](https://api.deployaja.id)
+- **Support**: [support@deployaja.id](mailto:support@deployaja.id)
 - **GitHub**: [github.com/deployaja/deployaja-cli](https://github.com/deployaja/deployaja-cli)
 
 ## ⭐ Support
 
-If you find Aja helpful, please:
+If you find DeployAja helpful, please:
 - ⭐ Star this repository
 - 🐛 Report bugs via [GitHub Issues](https://github.com/deployaja/deployaja-cli/issues)
 - 💡 Request features via [GitHub Discussions](https://github.com/deployaja/deployaja-cli/discussions)
@@ -893,6 +724,6 @@ If you find Aja helpful, please:
 
 ---
 
-**Made with ❤️ by the Aja Team**
+**Made with ❤️ by the DeployAja Team**
 
 *Deploy applications, not infrastructure.*
