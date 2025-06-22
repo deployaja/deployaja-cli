@@ -631,7 +631,7 @@ aja env --help
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `AJA_CONFIG_DIR` | Override config directory | `~/.deployaja` |
+| `DEPLOYAJA_TOKEN` | Set token with env |
 | `AJA_DEBUG` | Enable debug logging | `false` |
 | `NO_COLOR` | Disable colored output | `false` |
 

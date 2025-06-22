@@ -40,6 +40,10 @@ func LoadDeploymentConfigFromFile(filePath string) (*DeploymentConfig, error) {
 }
 
 func LoadToken() string {
+	if os.Getenv("DEPLOYAJA_TOKEN") != "" {
+		return os.Getenv("DEPLOYAJA_TOKEN")
+	}
+
 	home, _ := os.UserHomeDir()
 	tokenPath := filepath.Join(home, ConfigDir, TokenFile)
 
