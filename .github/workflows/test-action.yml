@@ -1,0 +1,42 @@
+name: Test DeployAja Action
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    name: Test DeployAja CLI Action
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Test Status Command
+        uses: ./
+        id: status
+        with:
+          command: 'status'
+          environment: 'test'
+          project-name: 'test-app'
+          additional-args: ''
+      
+      - name: Print Outputs
+        run: |
+          echo "Status: ${{ steps.status.outputs.status }}"
+          echo "Deployment ID: ${{ steps.status.outputs.deployment-id }}"
+          echo "Deployment URL: ${{ steps.status.outputs.deployment-url }}"
+      
+      - name: Test Help Command
+        uses: ./
+        with:
+          command: 'help'
+          
+      - name: Test Version Command
+        uses: ./
+        with:
+          command: 'version' 

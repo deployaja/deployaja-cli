@@ -1,0 +1,61 @@
+name: 'DeployAja CLI Action'
+description: 'Deploy applications using DeployAja CLI tool'
+author: 'DeployAja Team'
+
+# Define the inputs for your action
+inputs:
+  command:
+    description: 'DeployAja command to execute (deploy, status, logs, etc.)'
+    required: true
+    default: 'status'
+  
+  api-token:
+    description: 'DeployAja API token for authentication'
+    required: false
+  
+  config-file:
+    description: 'Path to DeployAja configuration file'
+    required: false
+    default: './deployaja.yaml'
+  
+  environment:
+    description: 'Target environment for deployment'
+    required: false
+    default: 'production'
+  
+  project-name:
+    description: 'Name of the project to deploy'
+    required: false
+  
+  additional-args:
+    description: 'Additional arguments to pass to the CLI'
+    required: false
+
+# Define the outputs from your action
+outputs:
+  deployment-id:
+    description: 'ID of the created deployment'
+  
+  deployment-url:
+    description: 'URL of the deployed application'
+  
+  status:
+    description: 'Status of the deployment operation'
+
+# Define how the action runs
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.command }}
+    - ${{ inputs.config-file }}
+    - ${{ inputs.environment }}
+    - ${{ inputs.project-name }}
+    - ${{ inputs.additional-args }}
+  env:
+    DEPLOYAJA_API_TOKEN: ${{ inputs.api-token }}
+
+# Branding for the marketplace
+branding:
+  icon: 'upload-cloud'
+  color: 'blue' 

@@ -38,6 +38,11 @@ cd deployaja-cli
 go build -o aja main.go
 ```
 
+### Using Docker
+```bash
+docker pull ghcr.io/deployaja/deployaja-cli/aja
+```
+
 ## Deploy APP from marketplace
 
 ```bash
@@ -77,6 +82,118 @@ $ aja plan
 $ aja deploy
 ```
 
+## GitHub Action Usage
+
+This repository also provides a GitHub Action that you can use in your workflows to deploy applications using DeployAja CLI.
+
+### Quick Start
+
+```yaml
+name: Deploy with DeployAja
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy Application
+        uses: deployaja/deployaja-cli@v1
+        with:
+          command: 'deploy'
+          api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
+          environment: 'production'
+          project-name: 'my-app'
+```
+
+### Outputs
+
+| Output | Description |
+|--------|-------------|
+| `deployment-id` | ID of the created deployment |
+| `deployment-url` | URL of the deployed application |
+| `status` | Status of the deployment operation |
+
+### Example Workflows
+
+#### Basic Deployment
+```yaml
+- name: Deploy to Production
+  uses: deployaja/deployaja-cli@v1
+  with:
+    command: 'deploy'
+    api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
+    environment: 'production'
+```
+
+#### Check Deployment Status
+```yaml
+- name: Check Deployment Status
+  uses: deployaja/deployaja-cli@v1
+  with:
+    command: 'status'
+    project-name: 'my-app'
+    environment: 'production'
+```
+
+#### View Application Logs
+```yaml
+- name: View Logs
+  uses: deployaja/deployaja-cli@v1
+  with:
+    command: 'logs'
+    project-name: 'my-app'
+    additional-args: '--tail 100'
+```
+
+#### Using Custom Configuration
+```yaml
+- name: Deploy with Custom Config
+  uses: deployaja/deployaja-cli@v1
+  with:
+    command: 'deploy'
+    config-file: './custom-deployaja.yaml'
+    api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
+```
+
+### Advanced Usage
+
+#### Matrix Deployments
+```yaml
+strategy:
+  matrix:
+    environment: [staging, production]
+    
+steps:
+  - name: Deploy to ${{ matrix.environment }}
+    uses: deployaja/deployaja-cli@v1
+    with:
+      command: 'deploy'
+      environment: ${{ matrix.environment }}
+      api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
+```
+
+#### Conditional Deployment
+```yaml
+- name: Deploy to Production
+  if: github.ref == 'refs/heads/main'
+  uses: deployaja/deployaja-cli@v1
+  with:
+    command: 'deploy'
+    environment: 'production'
+    api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
+```
+
+### Setup
+
+1. Add your DeployAja API token to your repository secrets as `DEPLOYAJA_API_TOKEN`
+2. Create a `deployaja.yaml` configuration file in your repository
+3. Use the action in your workflow as shown above
+
+
 ## 📖 Usage Examples
 
 ### Basic Web Application
@@ -115,7 +232,7 @@ healthCheck:
   periodSeconds: 10
 ```
 
-### Auto-Injected Environment Variables
+## Auto-Injected Environment Variables
 
 When you deploy the above configuration, your application automatically receives:
 

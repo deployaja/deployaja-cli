@@ -23,5 +23,9 @@ WORKDIR /app
 # Copy the built binary from builder
 COPY --from=builder /app/aja /usr/local/bin/aja
 
-# Set entrypoint
-ENTRYPOINT ["aja"]
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set entrypoint for GitHub Action
+ENTRYPOINT ["/entrypoint.sh"]
