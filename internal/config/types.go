@@ -37,6 +37,7 @@ type Dependency struct {
 	Type    string                 `yaml:"type"`
 	Version string                 `yaml:"version"`
 	Config  map[string]interface{} `yaml:"config,omitempty"`
+	Storage string                 `yaml:"storage,omitempty"`
 }
 
 type EnvVar struct {
