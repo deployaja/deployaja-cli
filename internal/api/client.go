@@ -433,7 +433,9 @@ func (c *APIClient) GetDependencies(depType string) (*DependenciesResponse, erro
 	return &depsResp, err
 }
 
-func (c *APIClient) GetDependencyInstance() (*[]DependencyInstanceResponse, error) {
+func (c *APIClient) GetDependencyInstance() (*struct {
+	Instances []DependencyInstanceResponse `json:"dependenciesInstances"`
+}, error) {
 	url := c.BaseURL + "/depInstance"
 
 	resp, err := c.makeAuthenticatedRequest("GET", url, nil)
@@ -442,7 +444,9 @@ func (c *APIClient) GetDependencyInstance() (*[]DependencyInstanceResponse, erro
 	}
 	defer resp.Body.Close()
 
-	var depInstanceResp []DependencyInstanceResponse
+	var depInstanceResp struct {
+		Instances []DependencyInstanceResponse `json:"dependenciesInstances"`
+	}
 	err = json.NewDecoder(resp.Body).Decode(&depInstanceResp)
 	return &depInstanceResp, err
 }

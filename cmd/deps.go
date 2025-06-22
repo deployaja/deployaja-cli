@@ -33,7 +33,7 @@ func depsCmd() *cobra.Command {
 					return err
 				}
 				fmt.Printf("%s Dependency Instance Details\n\n", ui.InfoPrint("🔍"))
-				for _, inst := range *response {
+				for _, inst := range *&response.Instances {
 					fmt.Printf("ID:        %v\n", inst.ID)
 					fmt.Printf("User ID:   %v\n", inst.UserID)
 					fmt.Printf("Type:      %v\n", inst.Type)
