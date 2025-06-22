@@ -77,42 +77,6 @@ $ aja plan
 $ aja deploy
 ```
 
-## 🤖 AI-Powered Configuration Generation
-
-The `aja gen` command uses AI to generate deployment configurations based on natural language prompts. This makes it easier to create complex configurations without manually writing YAML.
-
-```bash
-# Generate a configuration for a Node.js API with PostgreSQL
-$ aja gen "create a nodejs api with postgresql database"
-
-🤖 Generating content...
-✅ Content written to /tmp/deployaja-gen-42.yaml
-📝 Opening vim...
-```
-
-The generated configuration will be saved to a temporary YAML file with a unique filename and automatically opened in vim for editing. You can then:
-
-1. Review and modify the generated configuration
-2. Save the file to your project directory
-3. Deploy using `aja deploy -f <filename>`
-
-### Example Prompts
-
-```bash
-# Simple web applications
-aja gen "n8n"
-aja gen "vault"
-aja gen "minecraft server"
-aja gen "nodejs express api with cors enabled"
-aja gen "python flask app with gunicorn"
-
-# Applications with databases
-aja gen "wordpress with mysql database"
-aja gen "django app with postgresql and redis"
-aja gen "rails app with postgres and sidekiq"
-
-```
-
 ## 📖 Usage Examples
 
 ### Basic Web Application
@@ -136,15 +100,7 @@ dependencies:
   - name: "postgres"
     type: "postgresql"
     version: "15"
-    config:
-      database: "myapp_db"
-      storage: "2Gi"
-
-  - name: "redis"
-    type: "redis"
-    version: "7"
-    config:
-      storage: "512Mi"
+    storage_size: "1" # 1Gb 
 
 env:
   - name: "NODE_ENV"
