@@ -53,7 +53,15 @@ $ aja install n8n
 
 📦 Installing n8n from marketplace...
 ✅ Configuration saved to: /path/to/n8n.yaml
-💡 Review the configuration and run 'aja deploy' to deploy
+💡 Deployment initiated successfully
+
+$ aja status 
+
+📊 Deployment Status
+
+NAME                  STATUS    REPLICAS   URL                                        LAST DEPLOYED
+-------------------   -------   --------   ----------------------------------------   
+n8n-adipati73   running   1/1        https://n8n-adipati73.deployaja.id   2025-06-22 23:04:02
 
 # Install with custom domain
 $ aja install n8n --domain my-n8n.example.com
