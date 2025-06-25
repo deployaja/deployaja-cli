@@ -17,16 +17,7 @@ inputs:
     description: 'Path to DeployAja configuration file'
     required: false
     default: './deployaja.yaml'
-  
-  environment:
-    description: 'Target environment for deployment'
-    required: false
-    default: 'production'
-  
-  project-name:
-    description: 'Name of the project to deploy'
-    required: false
-  
+      
   additional-args:
     description: 'Additional arguments to pass to the CLI'
     required: false
@@ -49,8 +40,6 @@ runs:
   args:
     - ${{ inputs.command }}
     - ${{ inputs.config-file }}
-    - ${{ inputs.environment }}
-    - ${{ inputs.project-name }}
     - ${{ inputs.additional-args }}
   env:
     DEPLOYAJA_API_TOKEN: ${{ inputs.api-token }}

@@ -5,25 +5,18 @@ set -e
 # Parse inputs from GitHub Action
 COMMAND="$1"
 CONFIG_FILE="$2"
-ENVIRONMENT="$3"
-PROJECT_NAME="$4"
-ADDITIONAL_ARGS="$5"
+ADDITIONAL_ARGS="$3"
 
 echo "🚀 DeployAja CLI Action"
 echo "Command: $COMMAND"
 echo "Config File: $CONFIG_FILE"
-echo "Environment: $ENVIRONMENT"
-echo "Project: $PROJECT_NAME"
+echo "Additional Args: $ADDITIONAL_ARGS"
 
 # Build the command
 CMD_ARGS=""
 
-if [ -n "$ENVIRONMENT" ] && [ "$ENVIRONMENT" != "null" ]; then
-    CMD_ARGS="$CMD_ARGS --env $ENVIRONMENT"
-fi
-
-if [ -n "$PROJECT_NAME" ] && [ "$PROJECT_NAME" != "null" ]; then
-    CMD_ARGS="$CMD_ARGS --project $PROJECT_NAME"
+if [ -n "$CONFIG_FILE" ] && [ "$CONFIG_FILE" != "null" ]; then
+    CMD_ARGS="$CMD_ARGS -f $CONFIG_FILE"
 fi
 
 if [ -n "$ADDITIONAL_ARGS" ] && [ "$ADDITIONAL_ARGS" != "null" ]; then
