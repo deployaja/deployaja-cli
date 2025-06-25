@@ -2,7 +2,7 @@ package config
 
 // DeploymentConfig represents the deployaja.yaml structure
 type DeploymentConfig struct {
-	Name        string `yaml:"name"`	
+	Name        string `yaml:"name"`
 	Description string `yaml:"description,omitempty"`
 
 	Container struct {
@@ -27,8 +27,8 @@ type DeploymentConfig struct {
 		PeriodSeconds       int    `yaml:"periodSeconds"`
 	} `yaml:"healthCheck,omitempty"`
 
-	Domain  string   `yaml:"domain,omitempty"`
-	Volumes []Volume `yaml:"volumes,omitempty"`
+	Domain  string            `yaml:"domain,omitempty"`
+	Volumes []Volume          `yaml:"volumes,omitempty"`
 	EnvMap  map[string]string `yaml:"envMap,omitempty"`
 }
 
@@ -41,8 +41,9 @@ type Dependency struct {
 }
 
 type EnvVar struct {
-	Name  string `yaml:"name"`
-	Value string `yaml:"value"`
+	Name        string `yaml:"name"`
+	Value       string `yaml:"value"`
+	UserManaged bool   `yaml:"userManaged"`
 }
 
 type Volume struct {
