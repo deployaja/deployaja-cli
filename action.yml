@@ -42,7 +42,7 @@ runs:
     - ${{ inputs.config-file }}
     - ${{ inputs.additional-args }}
   env:
-    DEPLOYAJA_API_TOKEN: ${{ inputs.api-token }}
+    DEPLOYAJA_TOKEN: ${{ inputs.api-token }}
 
 # Branding for the marketplace
 branding:
