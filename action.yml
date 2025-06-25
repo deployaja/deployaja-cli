@@ -15,8 +15,7 @@ inputs:
   
   config-file:
     description: 'Path to DeployAja configuration file'
-    required: false
-    default: './deployaja.yaml'
+    required: false    
       
   additional-args:
     description: 'Additional arguments to pass to the CLI'
