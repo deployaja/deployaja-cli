@@ -97,6 +97,8 @@ $ aja deploy
 
 ## GitHub Action Usage
 
+Demo: [https://github.com/lukluk/demo-deployaja](https://github.com/lukluk/demo-deployaja)
+
 This repository provides a GitHub Action that you can use in your workflows to deploy applications using DeployAja CLI.
 
 ### Quick Start
