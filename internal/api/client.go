@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"deployaja-cli/internal/config"
+	"deployaja-cli/internal/version"
 
 	"gopkg.in/yaml.v3"
 )
@@ -192,6 +193,7 @@ func (c *APIClient) makeRequest(method, url string, body interface{}) (*http.Res
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-CLI-Version", version.GetVersion())
 
 	if c.Token != "" {
 		req.Header.Set("Authorization", "Bearer "+c.Token)
@@ -343,6 +345,7 @@ func (c *APIClient) GetLogsStream(name string, tail int, logChan chan<- LogEntry
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Cache-Control", "no-cache")
 	req.Header.Set("Connection", "keep-alive")
+	req.Header.Set("X-CLI-Version", version.GetVersion())
 
 	if c.Token != "" {
 		req.Header.Set("Authorization", "Bearer "+c.Token)
