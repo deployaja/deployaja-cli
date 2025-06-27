@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -544,6 +545,34 @@ func (c *APIClient) SearchApps(query string) (*SearchResponse, error) {
 	url := fmt.Sprintf("%s/search?q=%s", c.BaseURL, query)
 
 	resp, err := c.makeRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var searchResp SearchResponse
+	err = json.NewDecoder(resp.Body).Decode(&searchResp)
+	return &searchResp, err
+}
+
+// ListMarketplaceApps lists all apps in the marketplace with optional filtering and pagination
+func (c *APIClient) ListMarketplaceApps(params map[string]string) (*SearchResponse, error) {
+	urlStr := c.BaseURL + "/marketplace"
+
+	// Build query parameters
+	if len(params) > 0 {
+		queryParams := make([]string, 0, len(params))
+		for key, value := range params {
+			if value != "" {
+				queryParams = append(queryParams, fmt.Sprintf("%s=%s", url.QueryEscape(key), url.QueryEscape(value)))
+			}
+		}
+		if len(queryParams) > 0 {
+			urlStr += "?" + strings.Join(queryParams, "&")
+		}
+	}
+
+	resp, err := c.makeRequest("GET", urlStr, nil)
 	if err != nil {
 		return nil, err
 	}
