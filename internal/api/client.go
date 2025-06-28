@@ -637,23 +637,22 @@ func (c *APIClient) Gen(prompt string) (*GenResponse, error) {
 }
 
 func (c *APIClient) Describe(deploymentName string) (*DescribeResponse, error) {
-	url := fmt.Sprintf("%s/describe?deploymentName=%s", c.BaseURL, deploymentName)
+	if err := c.ensureValidToken(); err != nil {
+		return nil, err
+	}
 
-	resp, err := c.makeAuthenticatedRequest("GET", url, nil)
+	resp, err := c.makeAuthenticatedRequest("GET", c.BaseURL+"/describe/"+url.QueryEscape(deploymentName), nil)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		var errResp ErrorResponse
-		json.NewDecoder(resp.Body).Decode(&errResp)
-		return nil, fmt.Errorf("%s", errResp.Error.Message)
+	var result DescribeResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
 	}
 
-	var describeResp DescribeResponse
-	err = json.NewDecoder(resp.Body).Decode(&describeResp)
-	return &describeResp, err
+	return &result, nil
 }
 
 // PublishApp publishes an app to the marketplace.
@@ -710,4 +709,27 @@ func (c *APIClient) PublishApp(
 	var appResp AppResponse
 	err = json.NewDecoder(resp.Body).Decode(&appResp)
 	return &appResp, err
+}
+
+func (c *APIClient) Restart(deploymentName string) (*RestartResponse, error) {
+	if err := c.ensureValidToken(); err != nil {
+		return nil, err
+	}
+
+	requestBody := map[string]string{
+		"deploymentName": deploymentName,
+	}
+
+	resp, err := c.makeAuthenticatedRequest("POST", c.BaseURL+"/restart", requestBody)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result RestartResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }

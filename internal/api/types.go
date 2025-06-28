@@ -157,3 +157,13 @@ type GenRequest struct {
 type GenResponse struct {
 	Content string `json:"content"`
 }
+
+// Restart types
+type RestartResponse struct {
+	Status              string                   `json:"status"`
+	Message             string                   `json:"message"`
+	TotalPods           int                      `json:"totalPods"`
+	SuccessfulDeletions int                      `json:"successfulDeletions"`
+	FailedDeletions     int                      `json:"failedDeletions"`
+	Results             []map[string]interface{} `json:"results"`
+}
