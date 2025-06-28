@@ -50,8 +50,8 @@ func initCmd() *cobra.Command {
 			// Dependencies
 			cfg.Dependencies = []config.Dependency{
 				{
-					Name:    "postgres",
-					Type:    "database",
+					Name:    "postgresql",
+					Type:    "postgresql",
 					Version: "15",
 					Storage: "1Gi",
 				},
