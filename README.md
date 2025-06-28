@@ -194,8 +194,8 @@ resources:
   replicas: 2
 
 dependencies:
-  - name: "postgres"
-    type: "database"
+  - name: "postgresql"
+    type: "postgresql"
     version: "15"
     storage: "1Gi"
 
@@ -483,8 +483,8 @@ Dependencies are automatically configured with connection strings and environmen
 ```yaml
 dependencies:
   # PostgreSQL database
-  - name: "postgres"  
-    type: "database"
+  - name: "postgresql"
+    type: "postgresql"
     version: "15"
     storage: "5Gi"
 
@@ -546,8 +546,8 @@ resources:
 
 # Dependencies (managed services)
 dependencies:
-  - name: "postgres"
-    type: "database"
+  - name: "postgresql"
+    type: "postgresql"
     version: "15"
     storage: "2Gi"
 
