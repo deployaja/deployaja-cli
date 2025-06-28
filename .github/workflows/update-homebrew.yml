@@ -51,15 +51,6 @@ jobs:
           sed -i "s/PLACEHOLDER_SHA256_LINUX_ARM64/${{ steps.checksums.outputs.SHA256_LINUX_ARM64 }}/" Formula/aja.rb
           sed -i "s/PLACEHOLDER_SHA256_LINUX_AMD64/${{ steps.checksums.outputs.SHA256_LINUX_AMD64 }}/" Formula/aja.rb
       
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add Formula/aja.rb
-          git commit -m "Update Homebrew formula to ${{ steps.version.outputs.VERSION }}"
-          git push origin main
-      
       - name: Create/Update Homebrew Tap Repository
         env:
           TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
@@ -81,7 +72,7 @@ jobs:
             
             git add Formula/aja.rb
             git commit -m "Update aja to ${{ steps.version.outputs.VERSION }}" || exit 0
-            git push
+            git push origin main
             
             echo "✅ Successfully updated homebrew-tap repository"
           else
