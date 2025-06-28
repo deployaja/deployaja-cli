@@ -21,8 +21,7 @@ jobs:
         id: status
         with:
           command: 'status'
-          environment: 'test'
-          project-name: 'test-app'
+          api-token: ${{ secrets.DEPLOYAJA_TOKEN }}                    
           additional-args: ''
       
       - name: Print Outputs
