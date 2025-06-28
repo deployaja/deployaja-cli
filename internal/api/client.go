@@ -733,3 +733,66 @@ func (c *APIClient) Restart(deploymentName string) (*RestartResponse, error) {
 
 	return &result, nil
 }
+
+// GetDeploymentStatus gets the status of a specific deployment by name
+func (c *APIClient) GetDeploymentStatus(deploymentName string) (*DeploymentStatus, error) {
+	statusResp, err := c.GetStatus()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, deployment := range statusResp.Deployments {
+		if deployment.Name == deploymentName {
+			return &deployment, nil
+		}
+	}
+
+	return nil, fmt.Errorf("deployment '%s' not found", deploymentName)
+}
+
+// PollDeploymentStatus polls for deployment status until it reaches a final state
+func (c *APIClient) PollDeploymentStatus(deploymentName string, onStatusUpdate func(status string)) (*DeploymentStatus, error) {
+	const maxPollingDuration = 10 * time.Minute
+	const pollInterval = 5 * time.Second
+
+	finalStates := map[string]bool{
+		"success":   true,
+		"running":   true,
+		"failed":    true,
+		"error":     true,
+		"cancelled": true,
+		"timeout":   true,
+	}
+
+	startTime := time.Now()
+
+	for {
+		// Check if we've exceeded the maximum polling duration
+		if time.Since(startTime) > maxPollingDuration {
+			return nil, fmt.Errorf("polling timeout: deployment did not complete within %v", maxPollingDuration)
+		}
+
+		deployment, err := c.GetDeploymentStatus(deploymentName)
+		if err != nil {
+			// If deployment not found initially, wait and try again
+			if strings.Contains(err.Error(), "not found") && time.Since(startTime) < 30*time.Second {
+				time.Sleep(pollInterval)
+				continue
+			}
+			return nil, err
+		}
+
+		// Call the status update callback
+		if onStatusUpdate != nil {
+			onStatusUpdate(deployment.Status)
+		}
+
+		// Check if we've reached a final state
+		if finalStates[deployment.Status] {
+			return deployment, nil
+		}
+
+		// Wait before polling again
+		time.Sleep(pollInterval)
+	}
+}

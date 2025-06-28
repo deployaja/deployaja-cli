@@ -63,14 +63,49 @@ func deployCmd() *cobra.Command {
 				return err
 			}
 
-			fmt.Printf("%s %s\n", ui.SuccessPrint("✓"), response.Message)			
-
-			if response.EstimatedTime != "" {
-				fmt.Printf("Estimated time: %s\n", response.EstimatedTime)
-			}
+			fmt.Printf("%s %s\n", ui.SuccessPrint("✓"), response.Message)
 
 			if response.URL != "" {
 				fmt.Printf("URL: %s\n", response.URL)
+			}
+
+			// Don't poll status if it's a dry run
+			if dryRun {
+				return nil
+			}
+
+			// Poll for deployment status until completion
+			fmt.Printf("%s Waiting for deployment to complete...\n", ui.InfoPrint("🔍"))
+
+			var lastStatus string
+			statusCallback := func(status string) {
+				if status != lastStatus {
+					if status == "stopped" {
+						fmt.Printf("%s Re-Schedule deployment wait ..\n", ui.WarningPrint("⚠️"))
+						return
+					}
+					fmt.Printf("%s Status: %s\n", ui.InfoPrint("📊"), status)
+					lastStatus = status
+				}
+			}
+
+			finalDeployment, err := apiClient.PollDeploymentStatus(cfg.Name, statusCallback)
+			if err != nil {
+				fmt.Printf("%s Warning: Failed to monitor deployment status: %v\n", ui.WarningPrint("⚠️"), err)
+				fmt.Printf("%s You can check the status manually using: deployaja status\n", ui.InfoPrint("💡"))
+				return nil
+			}
+
+			// Show final status
+			if finalDeployment.Status == "running" || finalDeployment.Status == "success" {
+				fmt.Printf("%s Deployment completed successfully!\n", ui.SuccessPrint("🎉"))
+				if finalDeployment.URL != "" {
+					fmt.Printf("%s Access your application at: %s\n", ui.InfoPrint("🌐"), finalDeployment.URL)
+				}
+			} else {
+				fmt.Printf("%s Deployment failed with status: %s\n", ui.ErrorPrint("❌"), finalDeployment.Status)
+				fmt.Printf("%s Use 'deployaja describe %s' for more details\n", ui.InfoPrint("💡"), cfg.Name)
+				return fmt.Errorf("deployment failed")
 			}
 
 			return nil

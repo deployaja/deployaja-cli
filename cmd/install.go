@@ -75,14 +75,37 @@ The configuration will be saved as APPNAME-install.json in the current directory
 
 			absPath, _ := filepath.Abs(filename)
 			fmt.Printf("%s Configuration saved to: %s\n", ui.SuccessPrint("✅"), absPath)
-			fmt.Printf("%s %s\n", ui.InfoPrint("💡"), response.Message)
+			fmt.Printf("%s %s\n", ui.InfoPrint("💡"), response.Message)			
+			
 
-			if response.EstimatedTime != "" {
-				fmt.Printf("%s Estimated deployment time: %s\n", ui.InfoPrint("⏱️"), response.EstimatedTime)
+			// Poll for deployment status until completion
+			fmt.Printf("%s Waiting for deployment to complete...\n", ui.InfoPrint("🔍"))
+
+			var lastStatus string
+			statusCallback := func(status string) {
+				if status != lastStatus {
+					fmt.Printf("%s Status: %s\n", ui.InfoPrint("📊"), status)
+					lastStatus = status
+				}
 			}
 
-			if response.URL != "" {
-				fmt.Printf("%s Deployment URL: %s\n", ui.InfoPrint("🔗"), response.URL)
+			finalDeployment, err := apiClient.PollDeploymentStatus(response.DeploymentName, statusCallback)
+			if err != nil {
+				fmt.Printf("%s Warning: Failed to monitor deployment status: %v\n", ui.WarningPrint("⚠️"), err)
+				fmt.Printf("%s You can check the status manually using: deployaja status\n", ui.InfoPrint("💡"))
+				return nil
+			}
+
+			// Show final status
+			if finalDeployment.Status == "running" || finalDeployment.Status == "success" {
+				fmt.Printf("%s Installation completed successfully!\n", ui.SuccessPrint("🎉"))
+				if finalDeployment.URL != "" {
+					fmt.Printf("%s Access your application at: %s\n", ui.InfoPrint("🌐"), finalDeployment.URL)
+				}
+			} else {
+				fmt.Printf("%s Installation failed with status: %s\n", ui.ErrorPrint("❌"), finalDeployment.Status)
+				fmt.Printf("%s Use 'deployaja describe %s' for more details\n", ui.InfoPrint("💡"), response.DeploymentName)
+				return fmt.Errorf("installation failed")
 			}
 
 			return nil
