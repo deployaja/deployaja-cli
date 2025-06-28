@@ -266,6 +266,7 @@ Breakdown:
 | Command | Description |
 |---------|-------------|
 | `aja env [edit\|set\|get]` | Manage environment variables |
+| `aja restart NAME` | Restart deployment by recreating pods |
 | `aja drop NAME` | Delete deployment |
 | `aja rollback NAME` | Rollback to previous version |
 
@@ -325,6 +326,9 @@ aja env get
 
 # Get specific environment variable
 aja env get DEBUG
+
+# Restart deployment (recreate pods)
+aja restart my-app
 
 # Generate configuration with AI
 aja gen "create a nodejs api with postgresql database"
