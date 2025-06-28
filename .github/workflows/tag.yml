@@ -53,12 +53,13 @@ jobs:
         with:
           go-version: '1.24'
         
-      - name: Extract version from tag
+      - name: Set version variables
         id: version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          NEW_VERSION=${{ steps.next-version.outputs.NEW_VERSION }}
+          VERSION=${NEW_VERSION#v}
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "TAG=$NEW_VERSION" >> $GITHUB_OUTPUT
       
       - name: Build binaries
         run: |
