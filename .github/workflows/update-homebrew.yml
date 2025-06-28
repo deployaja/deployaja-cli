@@ -2,30 +2,91 @@ name: Update Homebrew Formula
 
 on:
   release:
-    types: [published]
+    types: [published, released]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to update Homebrew formula for'
+        required: true
+        type: string
+
+permissions:
+  contents: read
 
 jobs:
   update-homebrew:
     runs-on: ubuntu-latest    
     
     steps:
+      - name: Debug Event
+        run: |
+          echo "Event triggered:"
+          echo "  Event name: ${{ github.event_name }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "  Manual trigger with tag: ${{ github.event.inputs.release_tag }}"
+          else
+            echo "  Action: ${{ github.event.action }}"
+            echo "  Release Tag: ${{ github.event.release.tag_name }}"
+            echo "  Release Name: ${{ github.event.release.name }}"
+            echo "  Published: ${{ github.event.release.published_at }}"
+            echo "  Draft: ${{ github.event.release.draft }}"
+            echo "  Prerelease: ${{ github.event.release.prerelease }}"
+          fi
+      
       - name: Checkout main repo
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
       
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+      
       - name: Extract version
         id: version
         run: |
-          VERSION=${{ github.event.release.tag_name }}
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.release_tag }}"
+          else
+            VERSION="${{ github.event.release.tag_name }}"
+          fi
           VERSION_NO_V=${VERSION#v}
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "VERSION_NO_V=$VERSION_NO_V" >> $GITHUB_OUTPUT
+          echo "Using version: $VERSION (no v: $VERSION_NO_V)"
       
       - name: Download checksums
         run: |
-          curl -sL "https://github.com/deployaja/deployaja-cli/releases/download/${{ steps.version.outputs.VERSION }}/checksums.txt" > checksums.txt
+          echo "Downloading checksums for version: ${{ steps.version.outputs.VERSION }}"
+          CHECKSUM_URL="https://github.com/deployaja/deployaja-cli/releases/download/${{ steps.version.outputs.VERSION }}/checksums.txt"
+          echo "URL: $CHECKSUM_URL"
+          
+          # Wait a bit for the release assets to be fully available
+          sleep 30
+          
+          # Download with retry logic
+          for i in {1..5}; do
+            if curl -sL "$CHECKSUM_URL" > checksums.txt; then
+              echo "✅ Successfully downloaded checksums"
+              break
+            else
+              echo "❌ Attempt $i failed, retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
+          
+          # Verify the file exists and has content
+          if [ ! -s checksums.txt ]; then
+            echo "❌ checksums.txt is empty or doesn't exist"
+            echo "Available assets:"
+            curl -sL "https://api.github.com/repos/deployaja/deployaja-cli/releases/tags/${{ steps.version.outputs.VERSION }}" | jq -r '.assets[].name'
+            exit 1
+          fi
+          
+          echo "📄 Checksums file content:"
+          cat checksums.txt
       
       - name: Extract checksums
         id: checksums
