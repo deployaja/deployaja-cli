@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -15,10 +18,58 @@ jobs:
         with:
           fetch-depth: 0
       
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+      - name: Build binaries
+        run: |
+          mkdir -p dist
+          
+          # Build for macOS (Intel)
+          GOOS=darwin GOARCH=amd64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-darwin-amd64 main.go
+          
+          # Build for macOS (Apple Silicon)
+          GOOS=darwin GOARCH=arm64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-darwin-arm64 main.go
+          
+          # Build for Linux (x86_64)
+          GOOS=linux GOARCH=amd64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-linux-amd64 main.go
+          
+          # Build for Linux (ARM64)
+          GOOS=linux GOARCH=arm64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-linux-arm64 main.go
+          
+          # Build for Windows
+          GOOS=windows GOARCH=amd64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-windows-amd64.exe main.go
+      
+      - name: Create archives
+        run: |
+          cd dist
+          
+          # Create tar.gz for macOS and Linux
+          tar -czf aja-darwin-amd64.tar.gz aja-darwin-amd64
+          tar -czf aja-darwin-arm64.tar.gz aja-darwin-arm64
+          tar -czf aja-linux-amd64.tar.gz aja-linux-amd64
+          tar -czf aja-linux-arm64.tar.gz aja-linux-arm64
+          
+          # Create zip for Windows
+          zip aja-windows-amd64.zip aja-windows-amd64.exe
+      
+      - name: Generate checksums
+        run: |
+          cd dist
+          shasum -a 256 *.tar.gz *.zip > checksums.txt
+      
       - name: Generate Changelog
         id: changelog
         run: |
-          # Generate changelog from git log
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
           if [ -n "$PREVIOUS_TAG" ]; then
             CHANGELOG=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
@@ -30,26 +81,37 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
       
       - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          tag_name: ${{ steps.version.outputs.TAG }}
+          name: Release ${{ steps.version.outputs.TAG }}
           body: |
             ## Changes in this release
             
             ${{ steps.changelog.outputs.CHANGELOG }}
             
-            ## How to use this release
+            ## Installation
             
+            ### Homebrew (macOS/Linux)
+            ```bash
+            brew install deployaja/tap/aja
+            ```
+            
+            ### Manual Installation
+            Download the appropriate binary for your platform from the assets below.
+            
+            ### GitHub Action
             ```yaml
             - name: Deploy with DeployAja
-              uses: deployaja/deployaja-cli@${{ github.ref_name }}
+              uses: deployaja/deployaja-cli@${{ steps.version.outputs.TAG }}
               with:
                 command: 'deploy'
                 api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
             ```
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/checksums.txt
           draft: false
           prerelease: false
 

@@ -1,0 +1,90 @@
+name: Update Homebrew Formula
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-homebrew:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.release.tag_name, 'v')
+    
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=${{ github.event.release.tag_name }}
+          VERSION_NO_V=${VERSION#v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION_NO_V=$VERSION_NO_V" >> $GITHUB_OUTPUT
+      
+      - name: Download checksums
+        run: |
+          curl -sL "https://github.com/deployaja/deployaja-cli/releases/download/${{ steps.version.outputs.VERSION }}/checksums.txt" > checksums.txt
+      
+      - name: Extract checksums
+        id: checksums
+        run: |
+          SHA256_DARWIN_ARM64=$(grep "aja-darwin-arm64.tar.gz" checksums.txt | cut -d' ' -f1)
+          SHA256_DARWIN_AMD64=$(grep "aja-darwin-amd64.tar.gz" checksums.txt | cut -d' ' -f1)
+          SHA256_LINUX_ARM64=$(grep "aja-linux-arm64.tar.gz" checksums.txt | cut -d' ' -f1)
+          SHA256_LINUX_AMD64=$(grep "aja-linux-amd64.tar.gz" checksums.txt | cut -d' ' -f1)
+          
+          echo "SHA256_DARWIN_ARM64=$SHA256_DARWIN_ARM64" >> $GITHUB_OUTPUT
+          echo "SHA256_DARWIN_AMD64=$SHA256_DARWIN_AMD64" >> $GITHUB_OUTPUT
+          echo "SHA256_LINUX_ARM64=$SHA256_LINUX_ARM64" >> $GITHUB_OUTPUT
+          echo "SHA256_LINUX_AMD64=$SHA256_LINUX_AMD64" >> $GITHUB_OUTPUT
+      
+      - name: Update Homebrew Formula
+        run: |
+          # Update version
+          sed -i "s/version \".*\"/version \"${{ steps.version.outputs.VERSION_NO_V }}\"/" Formula/aja.rb
+          
+          # Update checksums
+          sed -i "s/PLACEHOLDER_SHA256_ARM64/${{ steps.checksums.outputs.SHA256_DARWIN_ARM64 }}/" Formula/aja.rb
+          sed -i "s/PLACEHOLDER_SHA256_AMD64/${{ steps.checksums.outputs.SHA256_DARWIN_AMD64 }}/" Formula/aja.rb
+          sed -i "s/PLACEHOLDER_SHA256_LINUX_ARM64/${{ steps.checksums.outputs.SHA256_LINUX_ARM64 }}/" Formula/aja.rb
+          sed -i "s/PLACEHOLDER_SHA256_LINUX_AMD64/${{ steps.checksums.outputs.SHA256_LINUX_AMD64 }}/" Formula/aja.rb
+      
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add Formula/aja.rb
+          git commit -m "Update Homebrew formula to ${{ steps.version.outputs.VERSION }}"
+          git push
+      
+      - name: Create/Update Homebrew Tap Repository
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          if [ -n "$TAP_TOKEN" ]; then
+            echo "Updating homebrew-tap repository..."
+            
+            # Clone the tap repository
+            git clone https://x-access-token:$TAP_TOKEN@github.com/deployaja/homebrew-tap.git tap-repo
+            cd tap-repo
+            
+            # Copy the updated formula
+            mkdir -p Formula
+            cp ../Formula/aja.rb Formula/aja.rb
+            
+            # Commit and push to tap repository
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            
+            git add Formula/aja.rb
+            git commit -m "Update aja to ${{ steps.version.outputs.VERSION }}" || exit 0
+            git push
+            
+            echo "✅ Successfully updated homebrew-tap repository"
+          else
+            echo "⚠️  TAP_TOKEN not set. Skipping tap repository update."
+            echo "To enable automatic tap updates, set the TAP_TOKEN secret."
+          fi 
