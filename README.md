@@ -28,6 +28,8 @@ DeployAja is a powerful CLI tool that simplifies container deployment with manag
 ```bash
 # macOS/Linux
 curl -sSL https://deployaja.id/setup.sh | bash
+# or
+brew install deployaja/tap/aja
 
 # Windows
 iwr -useb https://deployaja.id/setup.bat | iex

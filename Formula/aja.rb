@@ -1,7 +1,7 @@
 class Aja < Formula
   desc "Deploy applications with managed dependencies in seconds, not hours"
   homepage "https://deployaja.id"
-  version "1.0.0"
+  version "v1"
 
   if OS.mac?
     if Hardware::CPU.arm?
