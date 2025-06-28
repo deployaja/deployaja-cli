@@ -390,11 +390,9 @@ func (c *APIClient) GetLogsStream(name string, tail int, logChan chan<- LogEntry
 		// Parse SSE format: "data: {...}"
 		if strings.HasPrefix(line, "data: ") {
 			data := strings.TrimPrefix(line, "data: ")
+			data = strings.Trim(data, "\"")
 			if data == "[DONE]" {
-				// Stream ended
-				close(logChan)
-				close(errorChan)
-				return
+				continue
 			}
 
 			var logEntry LogEntry
