@@ -33,14 +33,22 @@ func restartCmd() *cobra.Command {
 			}
 
 			// Display the response
-			fmt.Printf("%s %s\n", ui.SuccessPrint("✓"), response.Message)
-			fmt.Printf("Status: %s\n", response.Status)
-			fmt.Printf("Total pods: %d\n", response.TotalPods)
-			fmt.Printf("Successful deletions: %d\n", response.SuccessfulDeletions)
-
-			if response.FailedDeletions > 0 {
-				fmt.Printf("%s Failed deletions: %d\n", ui.ErrorPrint("⚠"), response.FailedDeletions)
+			if !response.Success {
+				return fmt.Errorf("restart failed")
 			}
+
+			fmt.Printf("%s %s\n", ui.SuccessPrint("✓"), response.Data.Message)
+			fmt.Printf("Status: %s\n", response.Data.Status)
+			fmt.Printf("Method: %s\n", response.Data.Method)
+
+			// Display rollout status
+			rollout := response.Data.RolloutStatus
+			fmt.Printf("Rollout Status:\n")
+			fmt.Printf("  Generation: %d\n", rollout.Generation)
+			fmt.Printf("  Observed Generation: %d\n", rollout.ObservedGeneration)
+			fmt.Printf("  Replicas: %d\n", rollout.Replicas)
+			fmt.Printf("  Ready Replicas: %d\n", rollout.ReadyReplicas)
+			fmt.Printf("  Updated Replicas: %d\n", rollout.UpdatedReplicas)
 
 			return nil
 		},

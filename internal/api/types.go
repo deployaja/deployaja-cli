@@ -160,10 +160,21 @@ type GenResponse struct {
 
 // Restart types
 type RestartResponse struct {
-	Status              string                   `json:"status"`
-	Message             string                   `json:"message"`
-	TotalPods           int                      `json:"totalPods"`
-	SuccessfulDeletions int                      `json:"successfulDeletions"`
-	FailedDeletions     int                      `json:"failedDeletions"`
-	Results             []map[string]interface{} `json:"results"`
+	Success bool        `json:"success"`
+	Data    RestartData `json:"data"`
+}
+
+type RestartData struct {
+	Status        string        `json:"status"`
+	Message       string        `json:"message"`
+	Method        string        `json:"method"`
+	RolloutStatus RolloutStatus `json:"rolloutStatus"`
+}
+
+type RolloutStatus struct {
+	Generation         int `json:"generation"`
+	ObservedGeneration int `json:"observedGeneration"`
+	Replicas           int `json:"replicas"`
+	ReadyReplicas      int `json:"readyReplicas"`
+	UpdatedReplicas    int `json:"updatedReplicas"`
 }
