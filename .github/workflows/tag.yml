@@ -66,16 +66,16 @@ jobs:
           mkdir -p dist
           
           # Build for macOS (Intel)
-          GOOS=darwin GOARCH=amd64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-darwin-amd64 main.go
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-darwin-amd64 main.go
           
           # Build for macOS (Apple Silicon)
-          GOOS=darwin GOARCH=arm64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-darwin-arm64 main.go
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-darwin-arm64 main.go
           
           # Build for Linux (x86_64)
-          GOOS=linux GOARCH=amd64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-linux-amd64 main.go
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-linux-amd64 main.go
           
           # Build for Linux (ARM64)
-          GOOS=linux GOARCH=arm64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-linux-arm64 main.go
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-linux-arm64 main.go
           
           # Build for Windows
           GOOS=windows GOARCH=amd64 go build -ldflags="-X 'deployaja-cli/internal/version.Version=${{ steps.version.outputs.VERSION }}'" -o dist/aja-windows-amd64.exe main.go
