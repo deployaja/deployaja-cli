@@ -122,8 +122,7 @@ jobs:
         with:
           command: 'deploy'
           api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
-          environment: 'production'
-          project-name: 'my-app'
+          config-file: './deployaja.yaml'
 ```
 
 ### Action Inputs
@@ -132,9 +131,7 @@ jobs:
 |-------|-------------|----------|---------|
 | `command` | DeployAja command to execute | Yes | `status` |
 | `api-token` | DeployAja API token for authentication | No | - |
-| `config-file` | Path to DeployAja configuration file | No | `./deployaja.yaml` |
-| `environment` | Target environment for deployment | No | `production` |
-| `project-name` | Name of the project to deploy | No | - |
+| `config-file` | Path to DeployAja configuration file | No | - |
 | `additional-args` | Additional arguments to pass to the CLI | No | - |
 
 ### Action Outputs
@@ -154,7 +151,7 @@ jobs:
   with:
     command: 'deploy'
     api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
-    environment: 'production'
+    config-file: './deployaja.yaml'
 ```
 
 #### Check Deployment Status
@@ -163,8 +160,7 @@ jobs:
   uses: deployaja/deployaja-cli@v1
   with:
     command: 'status'
-    project-name: 'my-app'
-    environment: 'production'
+    api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
 ```
 
 #### View Application Logs
@@ -173,8 +169,8 @@ jobs:
   uses: deployaja/deployaja-cli@v1
   with:
     command: 'logs'
-    project-name: 'my-app'
-    additional-args: '--tail 100'
+    api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
+    additional-args: 'my-app --tail 100'
 ```
 
 ## 📖 Usage Examples
@@ -259,7 +255,7 @@ Breakdown:
 | `aja validate` | Validate configuration file |
 | `aja plan` | Show deployment plan and costs |
 | `aja deploy` | Deploy application |
-| `aja status` | Check deployment health and status |
+| `aja status` (or `aja ls`) | Check deployment health and status |
 | `aja describe NAME` | Describe deployment pod details (status, containers, events, etc.) |
 | `aja logs NAME` | View application logs |
 
@@ -280,8 +276,10 @@ Breakdown:
 | `aja login` | Authenticate with platform using browser OAuth |
 | `aja config` | Show configuration |
 | `aja search QUERY` | Search for apps in the marketplace |
+| `aja list` | List all marketplace apps with filtering and pagination |
 | `aja install APPNAME` | Install an app from the marketplace |
 | `aja publish` | Publish your app to the marketplace |
+| `aja upgrade` | Upgrade CLI to the latest version |
 | `aja version` | Show CLI version |
 
 ### Command Examples
@@ -307,6 +305,8 @@ aja logs my-app --tail 50 -f
 
 # Check all deployments
 aja status
+# or use the alias
+aja ls
 
 # Describe pod details with events
 aja describe my-app
@@ -340,9 +340,18 @@ aja gen "docker configuration for wordpress with mysql"
 aja search wordpress
 aja search "node.js api"
 
+# List all marketplace apps with filtering
+aja list
+aja list --category cms --sort-by downloads --sort-order desc
+aja list --author "WordPress.org" --page 2 --limit 10
+aja list --query "node.js" --category api
+
 # Install app from marketplace
 aja install wordpress
 aja install react-app --domain myapp.example.com --name my-react-app
+
+# Upgrade CLI to latest version
+aja upgrade
 
 # Publish your app to marketplace
 aja publish
@@ -422,7 +431,7 @@ aja deps my-postgres-instance
 
 The DeployAja marketplace provides pre-configured applications that you can deploy with a single command.
 
-### Searching Apps
+### Searching and Listing Apps
 
 ```bash
 # Search by name
@@ -430,6 +439,30 @@ aja search wordpress
 
 # Search by description or tags
 aja search "node.js api"
+
+# List all marketplace apps
+aja list
+
+# List with pagination
+aja list --page 2 --limit 10
+
+# Filter by category
+aja list --category cms
+aja list --category database --category api
+
+# Filter by author
+aja list --author "WordPress.org"
+
+# Sort results
+aja list --sort-by downloads --sort-order desc
+aja list --sort-by rating --sort-order desc
+aja list --sort-by name --sort-order asc
+
+# Combine filters and sorting
+aja list --category cms --sort-by downloads --sort-order desc --limit 5
+
+# Search within results
+aja list --query "node.js" --category api
 ```
 
 Example output:
@@ -478,11 +511,13 @@ Dependencies are automatically configured with connection strings and environmen
 
 | Service | Type | Versions | Auto-Injected Variables |
 |---------|------|----------|------------------------|
-| **PostgreSQL** | `database` | 13, 14, 15, 16 | Connection strings and credentials |
-| **MySQL** | `database` | 5.7, 8.0 | Connection strings and credentials |
-| **Redis** | `cache` | 6, 7 | Connection URLs and endpoints |
-| **RabbitMQ** | `queue` | 3.11, 3.12 | Connection URLs and credentials |
-| **MongoDB** | `database` | 5.0, 6.0, 7.0 | Connection strings and credentials |
+| **PostgreSQL** | `postgresql` | 13, 14, 15, 16 | Connection strings and credentials |
+| **MySQL** | `mysql` | 8.0, 8.1 | Connection strings and credentials |
+| **Redis** | `redis` | 6, 7 | Connection URLs and endpoints |
+| **RabbitMQ** | `rabbitmq` | 3.11, 3.12 | Connection URLs and credentials |
+| **MongoDB** | `mongodb` | 6.0, 7.0 | Connection strings and credentials |
+| **Elasticsearch** | `elasticsearch` | 8.8, 8.9 | Connection URLs and credentials |
+| **Memcached** | `memcached` | 1.6 | Connection URLs and endpoints |
 
 ### Dependency Configuration Examples
 
@@ -494,17 +529,41 @@ dependencies:
     version: "15"
     storage: "5Gi"
 
+  # MySQL database
+  - name: "mysql"
+    type: "mysql"
+    version: "8.0"
+    storage: "3Gi"
+
   # Redis cache
   - name: "cache"
-    type: "cache" 
+    type: "redis" 
     version: "7"
     storage: "1Gi"
 
   # RabbitMQ message queue
   - name: "queue"
-    type: "queue"
+    type: "rabbitmq"
     version: "3.12"
     storage: "2Gi"
+
+  # MongoDB document database
+  - name: "mongodb"
+    type: "mongodb"
+    version: "7.0"
+    storage: "4Gi"
+
+  # Elasticsearch search engine
+  - name: "search"
+    type: "elasticsearch"
+    version: "8.9"
+    storage: "10Gi"
+
+  # Memcached in-memory cache
+  - name: "memcache"
+    type: "memcached"
+    version: "1.6"
+    storage: "512Mi"
 ```
 
 ## ⚙️ Configuration
@@ -657,6 +716,8 @@ aja --help
 aja deploy --help
 aja env --help
 aja logs --help
+aja list --help
+aja upgrade --help
 ```
 
 ## 🌍 Environment Variables
