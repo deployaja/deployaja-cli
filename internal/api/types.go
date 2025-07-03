@@ -33,15 +33,42 @@ type StatusResponse struct {
 }
 
 type DeploymentStatus struct {
-	Name         string `json:"name"`
-	Status       string `json:"status"`
-	URL          string `json:"url,omitempty"`
-	LastDeployed string `json:"lastDeployed"`
-	CreatedAt    string `json:"createdAt,omitempty"`
-	Replicas     struct {
+	Name              string `json:"name"`
+	Status            string `json:"status"`
+	URL               string `json:"url,omitempty"`
+	LastDeployed      string `json:"lastDeployed"`
+	CreatedAt         string `json:"createdAt,omitempty"`
+	DesiredReplicas   int    `json:"desiredReplicas"`
+	AvailableReplicas int    `json:"availableReplicas"`
+	ReadyReplicas     int    `json:"readyReplicas"`
+	UpdatedReplicas   int    `json:"updatedReplicas"`
+	Pods              []Pod  `json:"pods"`
+	// Keep the old structure for backward compatibility
+	Replicas struct {
 		Desired   int `json:"desired"`
 		Available int `json:"available"`
 	} `json:"replicas"`
+}
+
+type Pod struct {
+	Name              string            `json:"name"`
+	Phase             string            `json:"phase"`
+	Ready             bool              `json:"ready"`
+	RestartCount      int               `json:"restartCount"`
+	Age               string            `json:"age"`
+	Status            string            `json:"status"`
+	Reason            string            `json:"reason,omitempty"`
+	Message           string            `json:"message,omitempty"`
+	ContainerStatuses []ContainerStatus `json:"containerStatuses"`
+}
+
+type ContainerStatus struct {
+	Name         string `json:"name"`
+	Ready        bool   `json:"ready"`
+	RestartCount int    `json:"restartCount"`
+	State        string `json:"state"`
+	Reason       string `json:"reason,omitempty"`
+	Message      string `json:"message,omitempty"`
 }
 
 type DependenciesResponse struct {

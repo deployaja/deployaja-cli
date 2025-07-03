@@ -23,13 +23,17 @@ var (
 )
 
 func GetStatusColor(status string) func(...interface{}) string {
-	switch status {
+	switch strings.ToLower(status) {
 	case "running":
 		return color.New(color.FgGreen).SprintFunc()
 	case "deploying":
 		return color.New(color.FgYellow).SprintFunc()
-	case "failed":
+	case "failed", "error":
 		return color.New(color.FgRed).SprintFunc()
+	case "pending":
+		return color.New(color.FgYellow).SprintFunc()
+	case "crash_loop":
+		return color.New(color.FgRed, color.Bold).SprintFunc()
 	default:
 		return color.New(color.FgWhite).SprintFunc()
 	}
