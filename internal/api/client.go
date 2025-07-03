@@ -3,6 +3,7 @@ package api
 import (
 	"bufio"
 	"bytes"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -42,11 +43,16 @@ func NewApiClient(token string) *APIClient {
 		baseUrl = "https://deployaja.id"
 	}
 
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
 	client := &APIClient{
 		BaseURL:  baseUrl + "/api/v1",
 		LoginURL: baseUrl + "/login",
 		HTTPClient: &http.Client{
-			Timeout: 30 * time.Second,
+			Timeout:   30 * time.Second,
+			Transport: tr,
 		},
 		Token: token,
 	}
