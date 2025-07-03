@@ -753,7 +753,7 @@ func (c *APIClient) GetDeploymentStatus(deploymentName string) (*DeploymentStatu
 // PollDeploymentStatus polls for deployment status until it reaches a final state
 func (c *APIClient) PollDeploymentStatus(deploymentName string, onStatusUpdate func(status string)) (*DeploymentStatus, error) {
 	const maxPollingDuration = 10 * time.Minute
-	const pollInterval = 5 * time.Second
+	const pollInterval = 10 * time.Second
 
 	finalStates := map[string]bool{
 		"success":   true,
@@ -763,6 +763,8 @@ func (c *APIClient) PollDeploymentStatus(deploymentName string, onStatusUpdate f
 		"cancelled": true,
 		"timeout":   true,
 	}
+
+	
 
 	startTime := time.Now()
 
