@@ -10,5 +10,5 @@
 .env.test
 .env.production
 aja
-
+bin/
 deployaja.yaml

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"deployaja-cli/internal/api"
 	"deployaja-cli/internal/config"
 	"deployaja-cli/internal/ui"
 
@@ -30,12 +31,16 @@ func deployCmd() *cobra.Command {
 				return err
 			}
 
+			fmt.Printf("%s Starting deployment process...\n", ui.InfoPrint("🔧"))
+
 			// Load config from specified file or default
 			var cfg *config.DeploymentConfig
 			var err error
 			if fileFlag != "" {
+				fmt.Printf("%s Loading configuration from file: %s\n", ui.InfoPrint("📄"), fileFlag)
 				cfg, err = config.LoadDeploymentConfigFromFile(fileFlag)
 			} else {
+				fmt.Printf("%s Checking for default configuration file...\n", ui.InfoPrint("📄"))
 				if err := validateDefaultConfigExists(); err != nil {
 					return err
 				}
@@ -48,19 +53,25 @@ func deployCmd() *cobra.Command {
 
 			// Override name if provided via flag
 			if nameFlag != "" {
+				fmt.Printf("%s Overriding deployment name: %s\n", ui.InfoPrint("✏️"), nameFlag)
 				cfg.Name = nameFlag
 			}
 
 			// Apply --set overrides
+			if len(setFlags) > 0 {
+				fmt.Printf("%s Applying configuration overrides...\n", ui.InfoPrint("🛠️"))
+			}
 			if err := applySetOverrides(cfg, setFlags); err != nil {
 				return err
 			}
 
 			fmt.Printf("%s Deploying %s...\n", ui.InfoPrint("🚀"), cfg.Name)
 
+			fmt.Printf("%s Sending deployment request to API...\n", ui.InfoPrint("📡"))
 			response, err := apiClient.Deploy(cfg, dryRun)
 			if err != nil {
-				return err
+				fmt.Printf("%s Deployment request failed: %v\n", ui.ErrorPrint("❌"), err)
+				return nil // Prevent Cobra from printing usage for runtime errors
 			}
 
 			fmt.Printf("%s %s\n", ui.SuccessPrint("✓"), response.Message)
@@ -71,41 +82,92 @@ func deployCmd() *cobra.Command {
 
 			// Don't poll status if it's a dry run
 			if dryRun {
+				fmt.Printf("%s Dry run complete. No resources were created.\n", ui.InfoPrint("💡"))
 				return nil
 			}
 
 			// Poll for deployment status until completion
-			fmt.Printf("%s Waiting for deployment to complete...\n", ui.InfoPrint("🔍"))
+			fmt.Printf("%s Monitoring deployment progress...\n", ui.InfoPrint("🔍"))
 
-			var lastStatus string
-			statusCallback := func(status string) {
-				if status != lastStatus {
-					if status == "stopped" {
-						fmt.Printf("%s Re-Schedule deployment wait ..\n", ui.WarningPrint("⚠️"))
-						return
+			var lastProgress int
+			var lastStep string
+			progressCallback := func(progress *api.DeploymentProgress) {
+				if progress.Progress.Percentage != lastProgress || progress.Progress.CurrentStep != lastStep {
+					// Create a simple progress bar
+					progressBar := createProgressBar(progress.Progress.Percentage)
+
+					fmt.Printf("\r%s Progress: [%s] %d%% - %s",
+						ui.InfoPrint("📊"),
+						progressBar,
+						progress.Progress.Percentage,
+						progress.Progress.CurrentStep)
+
+					// Add queue details if available
+					if progress.Queue.Status == "active" && progress.Queue.Message != "" {
+						fmt.Printf(" (%s)", progress.Queue.Message)
 					}
-					fmt.Printf("%s Status: %s\n", ui.InfoPrint("📊"), status)
-					lastStatus = status
+
+					lastProgress = progress.Progress.Percentage
+					lastStep = progress.Progress.CurrentStep
+
+					// Add newline if complete
+					if progress.Progress.IsComplete {
+						fmt.Printf("\n")
+					}
 				}
 			}
 
-			finalDeployment, err := apiClient.PollDeploymentStatus(cfg.Name, statusCallback)
+			finalDeployment, err := apiClient.PollDeploymentProgress(cfg.Name, progressCallback)
 			if err != nil {
-				fmt.Printf("%s Warning: Failed to monitor deployment status: %v\n", ui.WarningPrint("⚠️"), err)
+				fmt.Printf("\n%s Warning: Failed to monitor deployment progress: %v\n", ui.WarningPrint("⚠️"), err)
 				fmt.Printf("%s You can check the status manually using: deployaja status\n", ui.InfoPrint("💡"))
-				return nil
+				return nil // Prevent Cobra from printing usage for runtime errors
 			}
 
 			// Show final status
-			if finalDeployment.Status == "running" || finalDeployment.Status == "success" {
-				fmt.Printf("%s Deployment completed successfully!\n", ui.SuccessPrint("🎉"))
+			if finalDeployment != nil && (finalDeployment.Status == "running" || finalDeployment.Status == "success") {
+				fmt.Printf("\n%s Deployment completed successfully!\n", ui.SuccessPrint("🎉"))
 				if finalDeployment.URL != "" {
 					fmt.Printf("%s Access your application at: %s\n", ui.InfoPrint("🌐"), finalDeployment.URL)
 				}
-			} else {
-				fmt.Printf("%s Deployment failed with status: %s\n", ui.ErrorPrint("❌"), finalDeployment.Status)
+			} else if finalDeployment != nil {
+				fmt.Printf("\n%s Deployment failed with status: %s\n", ui.ErrorPrint("❌"), finalDeployment.Status)
 				fmt.Printf("%s Use 'deployaja describe %s' for more details\n", ui.InfoPrint("💡"), cfg.Name)
-				return fmt.Errorf("deployment failed")
+
+				// Try to fetch and print more info from the server
+				fmt.Printf("%s Fetching deployment details...\n", ui.InfoPrint("🔍"))
+				if describe, err := apiClient.Describe(cfg.Name); err == nil {
+					fmt.Printf("\n%s Deployment Error Details:\n", ui.ErrorPrint("---"))
+					if len(describe.Pod) > 0 {
+						fmt.Printf("Pod Info:\n")
+						for k, v := range describe.Pod {
+							fmt.Printf("  %s: %v\n", k, v)
+						}
+					}
+					if len(describe.Events) > 0 {
+						fmt.Printf("\nRecent Events:\n")
+						for _, event := range describe.Events {
+							if reason, ok := event["reason"]; ok {
+								fmt.Printf("- Reason: %v", reason)
+							} else {
+								fmt.Printf("- Event:")
+							}
+							if msg, ok := event["message"]; ok {
+								fmt.Printf(", Message: %v", msg)
+							}
+							if t, ok := event["type"]; ok {
+								fmt.Printf(", Type: %v", t)
+							}
+							fmt.Printf("\n")
+						}
+					}
+					if len(describe.Pod) == 0 && len(describe.Events) == 0 {
+						fmt.Printf("No detailed error information available from server.\n")
+					}
+				} else {
+					fmt.Printf("%s Failed to fetch deployment details: %v\n", ui.WarningPrint("⚠️"), err)
+				}
+				return nil // Prevent Cobra from printing usage for runtime errors
 			}
 
 			return nil
@@ -237,4 +299,12 @@ func validateDefaultConfigExists() error {
 	}
 
 	return nil
+}
+
+// createProgressBar creates a visual progress bar
+func createProgressBar(percentage int) string {
+	const width = 30
+	filled := (percentage * width) / 100
+	bar := strings.Repeat("█", filled) + strings.Repeat("░", width-filled)
+	return bar
 }

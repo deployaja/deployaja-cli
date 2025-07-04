@@ -798,3 +798,86 @@ func (c *APIClient) PollDeploymentStatus(deploymentName string, onStatusUpdate f
 		time.Sleep(pollInterval)
 	}
 }
+
+// GetDeploymentProgress gets detailed progress information for a deployment
+func (c *APIClient) GetDeploymentProgress(deploymentName string) (*DeploymentProgress, error) {
+	if err := c.ensureValidToken(); err != nil {
+		return nil, err
+	}
+
+	url := fmt.Sprintf("%s/deploy/progress?name=%s", c.BaseURL, url.QueryEscape(deploymentName))
+
+	resp, err := c.makeAuthenticatedRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result struct {
+		Data DeploymentProgress `json:"data"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result.Data, nil
+}
+
+// PollDeploymentProgress polls for deployment progress with detailed information
+func (c *APIClient) PollDeploymentProgress(deploymentName string, onProgressUpdate func(progress *DeploymentProgress)) (*DeploymentStatus, error) {
+	const maxPollingDuration = 10 * time.Minute
+	const pollInterval = 3 * time.Second
+
+	startTime := time.Now()
+
+	for {
+		// Check if we've exceeded the maximum polling duration
+		if time.Since(startTime) > maxPollingDuration {
+			return nil, fmt.Errorf("polling timeout: deployment did not complete within %v", maxPollingDuration)
+		}
+
+		// Get detailed progress information
+		progress, err := c.GetDeploymentProgress(deploymentName)
+		if err != nil {
+			// If progress endpoint fails, fallback to basic status
+			deployment, statusErr := c.GetDeploymentStatus(deploymentName)
+			if statusErr != nil {
+				// If deployment not found initially, wait and try again
+				if strings.Contains(err.Error(), "not found") && time.Since(startTime) < 30*time.Second {
+					time.Sleep(pollInterval)
+					continue
+				}
+				return nil, err
+			}
+
+			// Create a basic progress object for fallback
+			progress = &DeploymentProgress{
+				DeploymentName: deploymentName,
+				Status:         deployment.Status,
+				Progress: struct {
+					Percentage  int    `json:"percentage"`
+					CurrentStep string `json:"currentStep"`
+					IsComplete  bool   `json:"isComplete"`
+				}{
+					Percentage:  50,
+					CurrentStep: fmt.Sprintf("Status: %s", deployment.Status),
+					IsComplete:  deployment.Status == "running" || deployment.Status == "failed",
+				},
+			}
+		}
+
+		// Call the progress update callback
+		if onProgressUpdate != nil {
+			onProgressUpdate(progress)
+		}
+
+		// Check if deployment is complete
+		if progress.Progress.IsComplete {
+			// Return deployment status for compatibility
+			return c.GetDeploymentStatus(deploymentName)
+		}
+
+		// Wait before polling again
+		time.Sleep(pollInterval)
+	}
+}

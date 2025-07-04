@@ -205,3 +205,21 @@ type RolloutStatus struct {
 	ReadyReplicas      int `json:"readyReplicas"`
 	UpdatedReplicas    int `json:"updatedReplicas"`
 }
+
+// Progress types
+type DeploymentProgress struct {
+	DeploymentName string `json:"deploymentName"`
+	Status         string `json:"status"`
+	Progress       struct {
+		Percentage  int    `json:"percentage"`
+		CurrentStep string `json:"currentStep"`
+		IsComplete  bool   `json:"isComplete"`
+	} `json:"progress"`
+	Queue struct {
+		Status   string  `json:"status"`
+		Progress float64 `json:"progress"`
+		Message  string  `json:"message"`
+		Error    string  `json:"error"`
+	} `json:"queue"`
+	LastUpdated string `json:"lastUpdated"`
+}
