@@ -22,6 +22,9 @@ func deployCmd() *cobra.Command {
 	var nameFlag string
 	var setFlags []string
 	var dryRun bool
+	var dockerUsername string
+	var dockerPassword string
+	var dockerRegistry string
 	cmd := &cobra.Command{
 		Use:   "deploy",
 		Short: "Deploy application to cloud",
@@ -116,6 +119,9 @@ func deployCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&nameFlag, "name", "n", "", "Override the API name for deployment")
 	cmd.Flags().StringSliceVar(&setFlags, "set", []string{}, "Set configuration values using dot notation (e.g., --set container.image=nginx:latest --set resources.replicas=3)")
 	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "Dry run the deployment")
+	cmd.Flags().StringVarP(&dockerUsername, "username", "u", "", "Docker Repo username")
+	cmd.Flags().StringVarP(&dockerPassword, "password", "p", "", "Docker Repo password")
+	cmd.Flags().StringVarP(&dockerRegistry, "registry", "r", "", "Docker Repo registry")
 	return cmd
 }
 
