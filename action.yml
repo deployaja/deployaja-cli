@@ -21,6 +21,18 @@ inputs:
     description: 'Additional arguments to pass to the CLI'
     required: false
 
+  docker-username:
+    description: 'Docker Repo username'
+    required: false
+
+  docker-password:
+    description: 'Docker Repo password'
+    required: false
+
+  docker-registry:
+    description: 'Docker Repo registry'
+    required: false
+
 # Define the outputs from your action
 outputs:
   deployment-id:
@@ -40,6 +52,9 @@ runs:
     - ${{ inputs.command }}
     - ${{ inputs.config-file }}
     - ${{ inputs.additional-args }}
+    - ${{ inputs.docker-username }}
+    - ${{ inputs.docker-password }}
+    - ${{ inputs.docker-registry }}
   env:
     DEPLOYAJA_TOKEN: ${{ inputs.api-token }}
 
