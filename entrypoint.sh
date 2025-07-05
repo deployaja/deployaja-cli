@@ -14,6 +14,9 @@ echo "🚀 DeployAja CLI Action"
 echo "Command: $COMMAND"
 echo "Config File: $CONFIG_FILE"
 echo "Additional Args: $ADDITIONAL_ARGS"
+echo "Docker Username: $DOCKER_USERNAME"
+echo "Docker Password: $DOCKER_PASSWORD"
+echo "Docker Registry: $DOCKER_REGISTRY"
 
 # Build the command
 CMD_ARGS=""
