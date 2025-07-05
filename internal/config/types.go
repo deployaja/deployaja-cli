@@ -30,6 +30,18 @@ type DeploymentConfig struct {
 	Domain  string            `yaml:"domain,omitempty"`
 	Volumes []Volume          `yaml:"volumes,omitempty"`
 	EnvMap  map[string]string `yaml:"envMap,omitempty"`
+	DockerConfig *DockerConfig `yaml:"dockerConfig,omitempty"`
+}
+
+type DockerConfig struct {
+	Auths map[string]DockerAuth `yaml:"auths"`
+}
+
+type DockerAuth struct {
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Email    string `yaml:"email"`
+	Auth     string `yaml:"auth"`
 }
 
 type Dependency struct {

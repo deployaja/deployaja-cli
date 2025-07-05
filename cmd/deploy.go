@@ -61,7 +61,7 @@ func deployCmd() *cobra.Command {
 
 			fmt.Printf("%s Deploying %s...\n", ui.InfoPrint("🚀"), cfg.Name)
 
-			response, err := apiClient.Deploy(cfg, dryRun)
+			response, err := apiClient.Deploy(cfg, dryRun, dockerUsername, dockerPassword, dockerRegistry)
 			if err != nil {
 				return err
 			}
