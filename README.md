@@ -19,6 +19,7 @@ DeployAja is a powerful CLI tool that simplifies container deployment with manag
 - 📊 **Real-time Monitoring** - Status, logs, and health checks
 - 🔄 **Configuration Overrides** - Override any config value using `--set` flags
 - 🔍 **Pod Inspection** - Describe pod details, containers, and events
+- 🐳 **Docker Registry Support** - Deploy from private Docker registries
 
 ## 🚀 Quick Start
 
@@ -122,8 +123,7 @@ jobs:
         with:
           command: 'deploy'
           api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
-          environment: 'production'
-          project-name: 'my-app'
+          config-file: './deployaja.yaml'
 ```
 
 ### Action Inputs
@@ -132,10 +132,11 @@ jobs:
 |-------|-------------|----------|---------|
 | `command` | DeployAja command to execute | Yes | `status` |
 | `api-token` | DeployAja API token for authentication | No | - |
-| `config-file` | Path to DeployAja configuration file | No | `./deployaja.yaml` |
-| `environment` | Target environment for deployment | No | `production` |
-| `project-name` | Name of the project to deploy | No | - |
+| `config-file` | Path to DeployAja configuration file | No | - |
 | `additional-args` | Additional arguments to pass to the CLI | No | - |
+| `docker-username` | Docker registry username | No | - |
+| `docker-password` | Docker registry password | No | - |
+| `docker-registry` | Docker registry URL | No | - |
 
 ### Action Outputs
 
@@ -154,7 +155,7 @@ jobs:
   with:
     command: 'deploy'
     api-token: ${{ secrets.DEPLOYAJA_API_TOKEN }}
-    environment: 'production'
+    config-file: './deployaja.yaml'
 ```
 
 #### Check Deployment Status
@@ -163,8 +164,6 @@ jobs:
   uses: deployaja/deployaja-cli@v1
   with:
     command: 'status'
-    project-name: 'my-app'
-    environment: 'production'
 ```
 
 #### View Application Logs
@@ -173,8 +172,7 @@ jobs:
   uses: deployaja/deployaja-cli@v1
   with:
     command: 'logs'
-    project-name: 'my-app'
-    additional-args: '--tail 100'
+    additional-args: 'my-app --tail 100'
 ```
 
 ## 📖 Usage Examples
@@ -296,6 +294,9 @@ aja deploy --file my-custom-config.yaml
 # Deploy with custom name override
 aja deploy --name my-production-app
 
+# Deploy with Docker registry credentials
+aja deploy --username myuser --password mypass --registry registry.example.com
+
 # Dry run deployment
 aja deploy --dry-run
 
@@ -307,6 +308,9 @@ aja logs my-app --tail 50 -f
 
 # Check all deployments
 aja status
+
+# Check detailed deployment status
+aja status --detailed
 
 # Describe pod details with events
 aja describe my-app
@@ -478,11 +482,11 @@ Dependencies are automatically configured with connection strings and environmen
 
 | Service | Type | Versions | Auto-Injected Variables |
 |---------|------|----------|------------------------|
-| **PostgreSQL** | `database` | 13, 14, 15, 16 | Connection strings and credentials |
-| **MySQL** | `database` | 5.7, 8.0 | Connection strings and credentials |
-| **Redis** | `cache` | 6, 7 | Connection URLs and endpoints |
-| **RabbitMQ** | `queue` | 3.11, 3.12 | Connection URLs and credentials |
-| **MongoDB** | `database` | 5.0, 6.0, 7.0 | Connection strings and credentials |
+| **PostgreSQL** | `postgresql` | 13, 14, 15, 16 | Connection strings and credentials |
+| **MySQL** | `mysql` | 5.7, 8.0 | Connection strings and credentials |
+| **Redis** | `redis` | 6, 7 | Connection URLs and endpoints |
+| **RabbitMQ** | `rabbitmq` | 3.11, 3.12 | Connection URLs and credentials |
+| **MongoDB** | `mongodb` | 5.0, 6.0, 7.0 | Connection strings and credentials |
 
 ### Dependency Configuration Examples
 
@@ -496,13 +500,13 @@ dependencies:
 
   # Redis cache
   - name: "cache"
-    type: "cache" 
+    type: "redis" 
     version: "7"
     storage: "1Gi"
 
   # RabbitMQ message queue
   - name: "queue"
-    type: "queue"
+    type: "rabbitmq"
     version: "3.12"
     storage: "2Gi"
 ```
@@ -579,7 +583,8 @@ volumes:
   - name: "app-storage"
     size: "1Gi"
     mountPath: "/app/data"
-# Optional    
+
+# Optional: Environment variable mapping
 envMap:
   db_host: WORDPRESS_DB_HOST
   db_name: WORDPRESS_DB_NAME
@@ -587,6 +592,14 @@ envMap:
   db_password: WORDPRESS_DB_PASSWORD
   db_pass: WORDPRESS_DB_PASSWORD
 
+# Optional: Docker registry configuration
+dockerConfig:
+  auths:
+    registry.example.com:
+      username: "myuser"
+      password: "mypassword"
+      email: "user@example.com"
+      auth: "base64-encoded-auth"
 ```
 
 ### Validation Rules
@@ -684,7 +697,7 @@ aja logs --help
    ```yaml
    dependencies:
      - name: "cache"
-       type: "cache"
+       type: "redis"
        storage: "256Mi"  # Minimal storage for cache
    ```
 

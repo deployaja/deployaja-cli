@@ -33,6 +33,10 @@ inputs:
     description: 'Docker Repo registry'
     required: false
 
+  domain:
+    description: 'Domain of the deployed application'
+    required: false
+
 # Define the outputs from your action
 outputs:
   deployment-id:
@@ -55,6 +59,7 @@ runs:
     - ${{ inputs.docker-username }}
     - ${{ inputs.docker-password }}
     - ${{ inputs.docker-registry }}
+    - ${{ inputs.domain }}
   env:
     DEPLOYAJA_TOKEN: ${{ inputs.api-token }}
 
