@@ -147,11 +147,10 @@ func applySetOverrides(cfg *config.DeploymentConfig, setFlags []string) error {
 func setConfigValue(cfg *config.DeploymentConfig, path, value string) error {
 	parts := strings.Split(path, ".")
 
-	// Tambahan: dukung env[index].field
-	if parts[0] == "env" && len(parts) >= 2 {
-		idxStr := parts[1]
-		if strings.HasPrefix(idxStr, "[") && strings.HasSuffix(idxStr, "]") {
-			idxStr = idxStr[1 : len(idxStr)-1]
+	// dukungan set dengan index dengan format env[12].value (kurung siku) dan env.12.value (titik)
+	if len(parts) >= 2 {
+		if strings.HasPrefix(parts[0], "env[") && strings.HasSuffix(parts[0], "]") {
+			idxStr := parts[0][4 : len(parts[0])-1]
 			idx, err := strconv.Atoi(idxStr)
 			if err != nil {
 				return fmt.Errorf("invalid env index: %v", err)
@@ -159,10 +158,8 @@ func setConfigValue(cfg *config.DeploymentConfig, path, value string) error {
 			if idx < 0 || idx >= len(cfg.Env) {
 				return fmt.Errorf("env index %d out of range (len=%d)", idx, len(cfg.Env))
 			}
-			if len(parts) < 3 {
-				return fmt.Errorf("env[%d] requires a subfield (e.g., env[%d].value)", idx, idx)
-			}
-			switch parts[2] {
+			field := parts[1]
+			switch field {
 			case "name":
 				cfg.Env[idx].Name = value
 			case "value":
@@ -174,7 +171,33 @@ func setConfigValue(cfg *config.DeploymentConfig, path, value string) error {
 				}
 				cfg.Env[idx].UserManaged = b
 			default:
-				return fmt.Errorf("unknown env[%d] field: %s", idx, parts[2])
+				return fmt.Errorf("unknown env[%d] field: %s", idx, field)
+			}
+			return nil
+		}
+		if parts[0] == "env" && len(parts) >= 3 {
+			idxStr := parts[1]
+			idx, err := strconv.Atoi(idxStr)
+			if err != nil {
+				return fmt.Errorf("invalid env index: %v", err)
+			}
+			if idx < 0 || idx >= len(cfg.Env) {
+				return fmt.Errorf("env index %d out of range (len=%d)", idx, len(cfg.Env))
+			}
+			field := parts[2]
+			switch field {
+			case "name":
+				cfg.Env[idx].Name = value
+			case "value":
+				cfg.Env[idx].Value = value
+			case "userManaged":
+				b, err := strconv.ParseBool(value)
+				if err != nil {
+					return fmt.Errorf("env[%d].userManaged must be a boolean: %v", idx, err)
+				}
+				cfg.Env[idx].UserManaged = b
+			default:
+				return fmt.Errorf("unknown env[%d] field: %s", idx, field)
 			}
 			return nil
 		}
